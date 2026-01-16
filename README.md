@@ -12,8 +12,6 @@ We investigate a non-local gravitational leakage model derived from a hybrid RSI
 ### Key Concepts
 1.  **Spectral Propagator**: The effective force law is derived from the spectral density of bulk Kaluza-Klein modes:
     $$G(p) \approx \frac{1}{p^2} \left[ 1 + \left( \frac{a_5}{p^2} \right)^{n/2} \right]^{-1}$$
-    
-    
 
 2.  **Weyl Hysteresis (Dynamical Wake)**: 
     A geometric retardation governed by the 5D Bianchi identity. We resolve the Bullet Cluster paradox by distinguishing between the *static Vainshtein radius* ($r_V \approx 3$ Mpc) and the *dynamical equilibration timescale* ($\Delta t_{dyn} \approx 50$ Myr).
@@ -42,8 +40,9 @@ The observed **250 kpc** spatial offset is explained as a gravitational wake eff
 
 ## 📂 Repository Structure
 
-* `src/analysis.py`: Python script for numerical verification of the propagator limits and offset calculations.
-* `data/SPARC_Q2.csv`: Processed dataset of 140 galaxies used in the MCMC fit (ID, $g_{bar}$, $g_{obs}$, error).
+* `analyze.py`: Python script for numerical verification of the propagator limits and offset calculations.
+* `SPARC_Q2.csv`: Processed dataset of 140 galaxies used in the MCMC fit (ID, $g_{bar}$, $g_{obs}$, error).
+* `main.tex`: LaTeX source code of the manuscript.
 * `figures/`: High-resolution plots used in the paper.
 
 ---
