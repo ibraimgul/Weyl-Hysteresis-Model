@@ -2,36 +2,59 @@
 
 **Non-Local Gravitational Leakage: A Hybrid Braneworld Approach to the Radial Acceleration Relation and Cluster Offsets**
 
-[cite_start]This repository contains the numerical verification and analysis code for a non-local gravitational leakage model derived from a hybrid RSII-DGP braneworld action[cite: 5]. [cite_start]The model accounts for the Radial Acceleration Relation (RAR) and cluster-scale spatial offsets without invoking collisionless dark matter particles[cite: 6].
+This repository contains the numerical verification code and dataset for a non-local gravitational leakage model derived from a hybrid RSII-DGP braneworld action. The model unifies galactic dynamics (RAR) and cluster-scale spatial offsets (Bullet Cluster) through a single geometric framework, without invoking collisionless dark matter particles.
 
 ---
 
-## 🌌 Overview
-[cite_start]Traditional $\Lambda$CDM models rely on dark matter particles to explain galactic and cluster dynamics[cite: 15]. [cite_start]This research introduces **Weyl Hysteresis**, a geometric retardation governed by the 5D Bianchi identity, explaining the spatial lag in merging clusters as a gravitational wake effect[cite: 8, 46].
+## 🌌 Abstract & Theory
+We investigate a non-local gravitational leakage model derived from a hybrid RSII-DGP braneworld action via the **Källén-Lehmann spectral representation**. By defining an effective graviton propagator on a 3-brane with an infrared (IR) boost, we account for the Radial Acceleration Relation (RAR).
 
-### Key Theoretical Components
-* [cite_start]**Effective Propagator**: Derived from the spectral sum of Kaluza-Klein modes, defining an infrared (IR) boost on the 3-brane[cite: 37].
-[cite_start]$$G(p) \approx \frac{1}{p^2} \left[ 1 + \left( \frac{a_5}{p^2} \right)^{n/2} \right]^{-1}$$ [cite: 38]
-* [cite_start]**Weyl Hysteresis**: A geometric delay ($\Delta t \approx 52$ Myr) between baryonic matter and the gravitational potential[cite: 9, 47].
+### Key Concepts
+1.  **Spectral Propagator**: The effective force law is derived from the spectral density of bulk Kaluza-Klein modes:
+    $$G(p) \approx \frac{1}{p^2} \left[ 1 + \left( \frac{a_5}{p^2} \right)^{n/2} \right]^{-1}$$
+    
+    
+
+2.  **Weyl Hysteresis (Dynamical Wake)**: 
+    A geometric retardation governed by the 5D Bianchi identity. We resolve the Bullet Cluster paradox by distinguishing between the *static Vainshtein radius* ($r_V \approx 3$ Mpc) and the *dynamical equilibration timescale* ($\Delta t_{dyn} \approx 50$ Myr).
 
 ---
 
 ## 📊 Key Results
 
 ### 1. Radial Acceleration Relation (RAR)
-[cite_start]Analysis of 140 high-quality SPARC galaxies yields a transition index $n = 1.46 \pm 0.05$ and a leakage scale $a_5 \approx 1.2 \times 10^{-10} \text{ m/s}^2$[cite: 7, 64].
+Bayesian MCMC inference on **140 high-quality SPARC galaxies** ($Q \le 2$) yields:
+* **Transition Index:** $n = 1.46 \pm 0.05$
+* **Leakage Scale:** $a_5 \approx 1.2 \times 10^{-10} \text{ m/s}^2$ (Consistent with MOND $a_0$)
+* **Parsimony:** $\Delta \text{BIC} = 142.8$ relative to the $\Lambda$CDM baseline.
+
+![RAR Residuals](Figure_1_RAR_Residuals.png)
 
 ### 2. Bullet Cluster Offset (1E 0657-568)
-[cite_start]The observed $250$ kpc spatial offset is explained by the finite propagation time of bulk gravitons relative to brane matter[cite: 8, 84].
-* [cite_start]**Collision Velocity**: $v_{coll} \approx 4700$ km/s[cite: 48].
-* [cite_start]**Retardation Time**: $\Delta t \approx 52$ Myr[cite: 9, 47].
-* [cite_start]**Calculated Offset**: $\Delta x \approx 250$ kpc[cite: 49].
+The observed **250 kpc** spatial offset is explained as a gravitational wake effect.
+* **Collision Velocity:** $v_{coll} \approx 4700$ km/s
+* **Interaction Timescale:** $\Delta t \approx 52$ Myr
+* **Calculated Offset:** $\Delta x \approx 250$ kpc
+
+![Bullet Offset](Figure_4_Bullet_Offset.png)
+
+---
+
+## 📂 Repository Structure
+
+* `src/analysis.py`: Python script for numerical verification of the propagator limits and offset calculations.
+* `data/SPARC_Q2.csv`: Processed dataset of 140 galaxies used in the MCMC fit (ID, $g_{bar}$, $g_{obs}$, error).
+* `figures/`: High-resolution plots used in the paper.
 
 ---
 
 ## 🛠 Usage
-The analysis script `analyze.py` verifies the mathematical consistency of the model.
+
+To reproduce the numerical checks:
 
 ```bash
+# Clone the repository
+git clone [https://github.com/ibraimgul/Weyl-Hysteresis-Model.git](https://github.com/ibraimgul/Weyl-Hysteresis-Model.git)
+
 # Run the verification script
-python analyze.py
+python src/analysis.py
