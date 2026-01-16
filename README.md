@@ -1,38 +1,37 @@
 # Weyl-Hysteresis-Model
 
-**Non-Local Gravitational Leakage: A Hybrid Braneworld Approach to the Radial Acceleration Relation and Cluster Offsets**
+**Non-Local Gravitational Leakage: A Spectral Propagator Ansatz for Galactic Dynamics and Cluster Offsets**
 
 This repository contains the numerical verification code and dataset for a non-local gravitational leakage model derived from a hybrid RSII-DGP braneworld action. The model unifies galactic dynamics (RAR) and cluster-scale spatial offsets (Bullet Cluster) through a single geometric framework, without invoking collisionless dark matter particles.
 
 ---
 
 ## 🌌 Abstract & Theory
-We investigate a non-local gravitational leakage model derived from a hybrid RSII-DGP braneworld action via the **Källén-Lehmann spectral representation**. By defining an effective graviton propagator on a 3-brane with an infrared (IR) boost, we account for the Radial Acceleration Relation (RAR).
+[cite_start]We investigate a non-local gravitational leakage model derived from a hybrid RSII-DGP braneworld action via the **Källén-Lehmann spectral representation**[cite: 5, 17]. [cite_start]By defining an effective graviton propagator on a 3-brane with an infrared (IR) boost, we account for the Radial Acceleration Relation (RAR)[cite: 6, 12].
 
 ### Key Concepts
-1.  **Spectral Propagator**: The effective force law is derived from the spectral density of bulk Kaluza-Klein modes:
-    $$G(p) \approx \frac{1}{p^2} \left[ 1 + \left( \frac{a_5}{p^2} \right)^{n/2} \right]^{-1}$$
+1. [cite_start]**Spectral Propagator**: The effective force law is derived from the spectral density of bulk Kaluza-Klein modes[cite: 17, 135]:
+   [cite_start]$$G(p) \approx \frac{1}{p^2} \left[ 1 + \left( \frac{a_5}{p^2} \right)^{n/2} \right]^{-1}$$ [cite: 18]
 
-2.  **Weyl Hysteresis (Dynamical Wake)**: 
-    A geometric retardation governed by the 5D Bianchi identity. We resolve the Bullet Cluster paradox by distinguishing between the *static Vainshtein radius* ($r_V \approx 3$ Mpc) and the *dynamical equilibration timescale* ($\Delta t_{dyn} \approx 50$ Myr).
+2. [cite_start]**Weyl Hysteresis (Dynamical Wake)**: A geometric retardation governed by the 5D Bianchi identity[cite: 6, 42]. [cite_start]We resolve the Bullet Cluster paradox by distinguishing between the *static Vainshtein radius* ($r_V \approx 3$ Mpc) and the *dynamical equilibration timescale* ($\tau \approx 52$ Myr)[cite: 6, 39, 129].
 
 ---
 
 ## 📊 Key Results
 
 ### 1. Radial Acceleration Relation (RAR)
-Bayesian MCMC inference on **140 high-quality SPARC galaxies** ($Q \le 2$) yields:
-* **Transition Index:** $n = 1.46 \pm 0.05$
-* **Leakage Scale:** $a_5 \approx 1.2 \times 10^{-10} \text{ m/s}^2$ (Consistent with MOND $a_0$)
-* **Parsimony:** $\Delta \text{BIC} = 18.0$ relative to the $\Lambda$CDM baseline.
+[cite_start]Bayesian MCMC inference on **140 high-quality SPARC galaxies** ($i > 30^\circ, Q \le 2$) yields[cite: 6, 47]:
+* [cite_start]**Transition Index:** $n = 1.46 \pm 0.05$ [cite: 6, 61]
+* [cite_start]**Leakage Scale:** $a_5 \approx 1.21 \times 10^{-10} \text{ m/s}^2$ [cite: 97]
+* [cite_start]**Parsimony:** $\Delta \text{BIC} \approx 18.2$ relative to the $\Lambda$CDM+NFW baseline.
 
 ![RAR Residuals](Figure_1_RAR_Residuals.png)
 
 ### 2. Bullet Cluster Offset (1E 0657-568)
-The observed **250 kpc** spatial offset is explained as a gravitational wake effect.
-* **Collision Velocity:** $v_{coll} \approx 4700$ km/s
-* **Interaction Timescale:** $\Delta t \approx 52$ Myr
-* **Calculated Offset:** $\Delta x \approx 250$ kpc
+[cite_start]The observed **250 kpc** spatial offset is explained as a gravitational wake effect[cite: 6, 41]:
+* [cite_start]**Collision Velocity:** $v_{coll} \approx 4700$ km/s[cite: 42].
+* [cite_start]**Interaction Timescale:** $\tau \approx 52$ Myr[cite: 6, 129].
+* [cite_start]**Calculated Offset:** $\Delta x \approx 250$ kpc[cite: 42].
 
 ![Bullet Offset](Figure_4_Bullet_Offset.png)
 
@@ -41,8 +40,8 @@ The observed **250 kpc** spatial offset is explained as a gravitational wake eff
 ## 📂 Repository Structure
 
 * `analyze.py`: Python script for numerical verification of the propagator limits and offset calculations.
-* `SPARC_Q2.csv`: Processed dataset of 140 galaxies used in the MCMC fit (ID, $g_{bar}$, $g_{obs}$, error).
-* `main.tex`: LaTeX source code of the manuscript.
+* `SPARC_Q2.csv`: Processed dataset of 140 galaxies used in the MCMC fit.
+* [cite_start]`main.tex`: LaTeX source code of the manuscript[cite: 142].
 * `figures/`: High-resolution plots used in the paper.
 
 ---
