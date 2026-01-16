@@ -1,0 +1,171 @@
+\documentclass[reprint, amsmath, amssymb, aps, prd, showpacs, superscriptaddress, floatfix]{revtex4-2}
+
+% --- PAKETLER ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{longtable} 
+\usepackage{booktabs} 
+\usepackage{float}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+% Link Ayarları
+\hypersetup{
+    colorlinks=true,
+    linkcolor=NavyBlue,
+    citecolor=NavyBlue,
+    urlcolor=NavyBlue,
+    pdftitle={Non-Local Gravitational Leakage},
+    pdfauthor={Ibrahim Gul}
+}
+
+\begin{document}
+
+% GÜNCEL PACS
+\pacs{04.50.Kd, 98.62.Dm, 95.30.Sf}
+
+\title{Non-Local Gravitational Leakage: A Spectral Propagator Ansatz for Galactic Dynamics and Cluster Offsets}
+
+\author{Ibrahim Gül}
+\email{gulpoetika@gmail.com}
+\thanks{ ORCID: \href{https://orcid.org/0009-0003-0078-751X}{0009-0003-0078-751X}}
+\affiliation{Independent Researcher, Ankara, Türkiye}
+
+\date{January 17, 2026}
+
+\begin{abstract}
+We propose a phenomenological non-local gravity model derived from the spectral density of bulk Kaluza-Klein modes. By defining an effective propagator on a 3-brane, we fit the Radial Acceleration Relation (RAR) using a high-fidelity subsample of 140 SPARC galaxies ($i > 30^\circ$). Bayesian MCMC inference yields a transition index $n = 1.46 \pm 0.05$. We discuss the degeneracy between $n$ and the residual scatter ($\sigma_{RMS} \approx 0.11$ dex), suggesting that the transition region data lacks the sensitivity to strictly distinguish $n=1.46$ from the standard MOND slope ($n=1$). Additionally, we treat the Bullet Cluster (1E 0657-568) offset as a phenomenological constraint on the bulk response time, finding that a relaxation scale of $\tau \approx 52$ Myr is required to accommodate the observed offset. The model shows moderate statistical preference ($\Delta \text{BIC} \approx 18$) over a conservative $\Lambda$CDM+NFW baseline. \\
+\textbf{Data Availability:} \url{https://github.com/ibraimgul/Weyl-Hysteresis-Model}
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+The universality of the Radial Acceleration Relation (RAR) suggests a fundamental modification to dynamics \cite{McGaugh2016}. While MOND provides a successful effective field theory, its UV completion in 5D gravity remains open. We propose a spectral propagator ansatz and rigorously test it against SPARC data and cluster constraints.
+
+\section{Theoretical Framework}
+
+\subsection{Spectral Propagator}
+Motivated by the Källén-Lehmann representation (derived in Appendix A), we use the ansatz:
+\begin{equation}
+    G(p) \approx \frac{1}{p^2} \left[ 1 + \left( \frac{a_5}{p^2} \right)^{n/2} \right]^{-1} \label{eq:prop}
+\end{equation}
+Here, $n$ characterizes the spectral dimension of the leakage. $n=1$ corresponds to a 5D flat bulk (DGP limit), while $n \neq 1$ implies anomalous scaling dimensions in the bulk.
+
+% --- FIGÜR 3: PROPAGATOR (Teori Kısmında) ---
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=0.95\columnwidth]{Figure_3_Propagator.png}
+    \caption{Effective propagator $G(p)$ showing the UV-IR transition. The model recovers GR in the high-momentum limit ($p^2 \gg a_5$).}
+    \label{fig:prop_img}
+\end{figure}
+
+\subsection{Bullet Cluster as a Constraint}
+Rather than proposing a solution, we use the Bullet Cluster offset ($250$ kpc) to constrain the model. If the 5D bulk geometry exhibits hysteresis with a time constant $\tau_{dyn}$, the offset $\Delta x \approx v_{coll} \tau_{dyn}$ implies $\tau_{dyn} \approx 52$ Myr. This timescale does not naturally emerge from standard static screening (Vainshtein $r_V \sim 3$ Mpc), suggesting that if non-local gravity is the cause, the bulk must possess dynamical degrees of freedom with relaxation times exceeding the light-crossing time of the screening radius.
+
+% --- FIGÜR 4: BULLET OFFSET (Teori Kısmında) ---
+\begin{figure}[b!]
+    \centering
+    \includegraphics[width=0.95\columnwidth]{Figure_4_Bullet_Offset.png}
+    \caption{Schematic of the proposed Weyl Hysteresis mechanism. The observed 250 kpc offset constrains the bulk response time to $\sim 52$ Myr.}
+    \label{fig:bullet_img}
+\end{figure}
+
+\section{Methodology}
+
+\subsection{Data and Inference}
+We analyze 140 SPARC galaxies ($Q \le 2, i > 30^\circ$). We perform Bayesian inference using \textit{emcee} (32 walkers, $10^5$ steps).
+\textbf{Convergence:} We discard the first $20,000$ steps as burn-in. The integrated autocorrelation time is $\tau_{ac} \approx 50$ steps, ensuring $>1500$ independent samples per walker. The likelihood is Gaussian:
+\begin{equation}
+    \ln \mathcal{L} = -\frac{1}{2} \sum \left[ \frac{(g_{obs} - g_{model})^2}{\sigma_{tot}^2} + \ln(2\pi\sigma_{tot}^2) \right]
+\end{equation}
+
+\section{Results}
+
+\subsection{The n=1.46 Degeneracy}
+The posterior yields $n = 1.46 \pm 0.05$. Standard MOND ($n=1$) also fits within $\sigma=0.11$ dex. The preference for $n=1.46$ indicates a slight steepening in the transition, but the likelihood surface is shallow. This implies a "parameter degeneracy" where intrinsic scatter masks the precise slope of the interpolation function.
+
+% --- FIGÜR 1: RAR RESIDUALS (Sonuçlar Kısmında) ---
+\begin{figure}[t!]
+\centering
+\includegraphics[width=0.95\columnwidth]{Figure_1_RAR_Residuals.png}
+\caption{\label{fig:rar}RAR fit ($n=1.46$) and residuals. The scatter is consistent with observational errors, showing no systematic trend with luminosity.}
+\end{figure}
+
+\subsection{Model Selection (Realistic BIC)}
+We compare the hybrid model ($k=2$) against $\Lambda$CDM+NFW. For NFW, we assume minimal freedom ($k \approx 25$, fixing concentration via mass relations).
+\begin{equation}
+    \Delta \text{BIC} = \text{BIC}_{NFW} - \text{BIC}_{Hybrid} \approx 18.2
+\end{equation}
+This indicates "positive" but not "decisive" evidence, reflecting the penalty of halo parameters versus the simplicity of the hybrid ansatz.
+
+% --- FIGÜR 2: CORNER PLOT (Sonuçlar Kısmında) ---
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.85\columnwidth]{Figure_2_Corner.png}
+\caption{\label{fig:corner}Posterior distributions showing the covariance between $n$ and $a_5$. The parameters are well-constrained.}
+\end{figure}
+
+\section{Conclusion}
+The spectral propagator ansatz provides a competitive fit to galactic dynamics ($\Delta \text{BIC} \approx 18$). The derived index $n=1.46$ is statistically indistinguishable from MOND in terms of residuals due to scatter. The Bullet Cluster requires a bulk relaxation time of $\sim 50$ Myr, posing a challenge for static screening mechanisms.
+
+\begin{acknowledgments}
+We thank the SPARC team for their public data release.
+\end{acknowledgments}
+
+% --- APPENDIX ---
+\clearpage
+\onecolumngrid
+\appendix
+
+\section{Exact Spectral Integration}
+\setcounter{equation}{0}
+\renewcommand{\theequation}{A\arabic{equation}}
+
+We evaluate the propagator from the Källén-Lehmann form with a power-law spectral density $\rho(\mu) = A \mu^{\alpha-1}$:
+\begin{equation}
+    G(p) = \int_0^\infty \frac{A \mu^{\alpha-1}}{p^2 + \mu^2} d\mu
+\end{equation}
+Substituting $x = (\mu/p)^2$, this transforms into a Beta function integral:
+\begin{equation}
+    G(p) = \frac{A}{2} p^{\alpha-2} \int_0^\infty \frac{x^{\alpha/2 - 1}}{1+x} dx = \frac{A \pi}{2} p^{\alpha-2} \csc\left(\frac{\pi \alpha}{2}\right)
+\end{equation}
+This exact result confirms the power-law behavior $p^{\alpha-2}$. The ansatz in Eq. (\ref{eq:prop}) is the Padé approximant matching this IR behavior to the UV pole, with $n = 2(2-\alpha)$.
+
+\section{Data Availability}
+The analysis uses the processed SPARC subset available at GitHub. Below is a snippet of the file structure (using $m/s^2$ units).
+
+% VERBATIM KULLANILDI (HATA VERMEZ)
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+\textbf{data/SPARC\_Q2.csv (Snippet)}
+\vspace{5pt}
+\hrule
+\begin{verbatim}
+ID,       g_bar,      g_obs,      err_tot
+NGC5055,  1.74e-11,   5.77e-11,   0.70e-11
+NGC2841,  2.59e-10,   2.98e-10,   0.37e-10
+NGC6503,  2.44e-10,   3.22e-10,   0.16e-10
+...       ...         ...         ...
+(Total 140 galaxies)
+\end{verbatim}
+\hrule
+\end{minipage}
+\end{center}
+
+\twocolumngrid
+
+\begin{thebibliography}{99}
+\bibitem{McGaugh2016} S. S. McGaugh et al., Phys. Rev. Lett. \textbf{117}, 201101 (2016).
+\bibitem{Lelli2016} F. Lelli et al., Astron. J. \textbf{152}, 157 (2016).
+\bibitem{Dvali2000} G. Dvali et al., Phys. Lett. B \textbf{485}, 208 (2000).
+\bibitem{Maartens2010} R. Maartens and K. Koyama, Living Rev. Relativ. \textbf{13}, 5 (2010).
+\bibitem{Bertotti2003} B. Bertotti et al., Nature \textbf{425}, 374 (2003).
+\bibitem{Clowe2006} D. Clowe et al., Astrophys. J. Lett. \textbf{648}, L109 (2006).
+\bibitem{Sanders2002} R. H. Sanders and S. S. McGaugh, Annu. Rev. Astron. Astrophys. \textbf{40}, 263 (2002).
+\end{thebibliography}
+
+\end{document}
