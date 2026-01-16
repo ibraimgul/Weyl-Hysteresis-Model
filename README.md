@@ -1,37 +1,37 @@
 # Weyl-Hysteresis-Model
 
-**Non-Local Gravitational Leakage: A Spectral Propagator Ansatz for Galactic Dynamics and Cluster Offsets**
+**Non-Local Gravitational Leakage: A Scalar-Tensor Braneworld Approach to Galactic Dynamics**
 
-This repository contains the numerical verification code and dataset for a non-local gravitational leakage model derived from a hybrid RSII-DGP braneworld action. The model unifies galactic dynamics (RAR) and cluster-scale spatial offsets (Bullet Cluster) through a single geometric framework, without invoking collisionless dark matter particles.
+This repository contains the numerical verification code and dataset for a non-local gravity model derived from a **5D Einstein-Dilaton action**. The model unifies galactic dynamics (RAR) and cluster-scale spatial offsets (Bullet Cluster) through a single geometric framework involving Lifshitz scaling and metastable bulk gravitons.
 
 ---
 
 ## 🌌 Abstract & Theory
-[cite_start]We investigate a non-local gravitational leakage model derived from a hybrid RSII-DGP braneworld action via the **Källén-Lehmann spectral representation**[cite: 5, 17]. [cite_start]By defining an effective graviton propagator on a 3-brane with an infrared (IR) boost, we account for the Radial Acceleration Relation (RAR)[cite: 6, 12].
+We propose a UV-complete non-local gravity model where the anomalous scaling of the graviton propagator arises from a **bulk dilaton field** $\phi$. This generates a non-AdS (Lifshitz) background geometry that modifies the Kaluza-Klein spectral density.
 
-### Key Concepts
-1. [cite_start]**Spectral Propagator**: The effective force law is derived from the spectral density of bulk Kaluza-Klein modes[cite: 17, 135]:
-   [cite_start]$$G(p) \approx \frac{1}{p^2} \left[ 1 + \left( \frac{a_5}{p^2} \right)^{n/2} \right]^{-1}$$ [cite: 18]
+### Key Theoretical Mechanisms
+1.  **Lifshitz Scaling via Dilaton**: The transition index $n$ is not arbitrary but fixed by the bulk scalar coupling $\gamma$:
+    $$ds^2 = \left(\frac{L}{z}\right)^{2\delta} (\eta_{\mu\nu} dx^\mu dx^\nu - dz^2), \quad n = 2\delta - 1$$
 
-2. [cite_start]**Weyl Hysteresis (Dynamical Wake)**: A geometric retardation governed by the 5D Bianchi identity[cite: 6, 42]. [cite_start]We resolve the Bullet Cluster paradox by distinguishing between the *static Vainshtein radius* ($r_V \approx 3$ Mpc) and the *dynamical equilibration timescale* ($\tau \approx 52$ Myr)[cite: 6, 39, 129].
+2.  **Volcano Potential & Tunneling**: The Bullet Cluster offset is explained not by superluminal travel, but by the **WKB tunneling time** ($\tau$) of metastable gravitons through the effective potential barrier $V_{eff}(z)$ created by the brane.
 
 ---
 
 ## 📊 Key Results
 
-### 1. Radial Acceleration Relation (RAR)
-[cite_start]Bayesian MCMC inference on **140 high-quality SPARC galaxies** ($i > 30^\circ, Q \le 2$) yields[cite: 6, 47]:
-* [cite_start]**Transition Index:** $n = 1.46 \pm 0.05$ [cite: 6, 61]
-* [cite_start]**Leakage Scale:** $a_5 \approx 1.21 \times 10^{-10} \text{ m/s}^2$ [cite: 97]
-* [cite_start]**Parsimony:** $\Delta \text{BIC} \approx 18.2$ relative to the $\Lambda$CDM+NFW baseline.
+### 1. Galactic Dynamics (SPARC)
+Bayesian MCMC inference on **140 high-quality SPARC galaxies** ($i > 30^\circ, Q \le 2$) yields:
+* **Transition Index:** $n = 1.46 \pm 0.05$
+* **Implied Lifshitz Exponent:** $\delta \approx 1.23$ (Deviates from standard AdS $\delta=1$)
+* **Leakage Scale:** $a_5 \approx 1.2 \times 10^{-10} \text{ m/s}^2$
+* **Parsimony:** $\Delta \text{BIC} \approx 18.2$ preference over $\Lambda$CDM+NFW.
 
 ![RAR Residuals](Figure_1_RAR_Residuals.png)
 
-### 2. Bullet Cluster Offset (1E 0657-568)
-[cite_start]The observed **250 kpc** spatial offset is explained as a gravitational wake effect[cite: 6, 41]:
-* [cite_start]**Collision Velocity:** $v_{coll} \approx 4700$ km/s[cite: 42].
-* [cite_start]**Interaction Timescale:** $\tau \approx 52$ Myr[cite: 6, 129].
-* [cite_start]**Calculated Offset:** $\Delta x \approx 250$ kpc[cite: 42].
+### 2. Bullet Cluster Constraint
+The observed **250 kpc** offset is reconciled via the decay width of the bulk resonance:
+* **Tunneling Time:** $\tau \approx 52 \text{ Myr}$
+* **Stability:** The model satisfies the Breitenlohner-Freedman bound ($m^2 \ge -4k^2$) and maintains subluminal signal propagation ($v_g < c$).
 
 ![Bullet Offset](Figure_4_Bullet_Offset.png)
 
@@ -39,16 +39,16 @@ This repository contains the numerical verification code and dataset for a non-l
 
 ## 📂 Repository Structure
 
-* `analyze.py`: Python script for numerical verification of the propagator limits and offset calculations.
+* `analyze.py`: Python script for verification of Lifshitz scaling parameters, BF stability bounds, and tunneling time consistency.
 * `SPARC_Q2.csv`: Processed dataset of 140 galaxies used in the MCMC fit.
-* [cite_start]`main.tex`: LaTeX source code of the manuscript[cite: 142].
+* `main.tex`: Source code of the manuscript (RevTeX 4.2).
 * `figures/`: High-resolution plots used in the paper.
 
 ---
 
 ## 🛠 Usage
 
-To reproduce the numerical checks:
+To reproduce the theoretical consistency checks:
 
 ```bash
 # Clone the repository
