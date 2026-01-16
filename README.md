@@ -57,4 +57,4 @@ To reproduce the numerical checks:
 git clone [https://github.com/ibraimgul/Weyl-Hysteresis-Model.git](https://github.com/ibraimgul/Weyl-Hysteresis-Model.git)
 
 # Run the verification script
-python python analyze.py
+python analyze.py
