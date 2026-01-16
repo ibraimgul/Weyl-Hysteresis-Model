@@ -26,7 +26,7 @@ We investigate a non-local gravitational leakage model derived from a hybrid RSI
 Bayesian MCMC inference on **140 high-quality SPARC galaxies** ($Q \le 2$) yields:
 * **Transition Index:** $n = 1.46 \pm 0.05$
 * **Leakage Scale:** $a_5 \approx 1.2 \times 10^{-10} \text{ m/s}^2$ (Consistent with MOND $a_0$)
-* **Parsimony:** $\Delta \text{BIC} = 142.8$ relative to the $\Lambda$CDM baseline.
+* **Parsimony:** $\Delta \text{BIC} = 18.0$ relative to the $\Lambda$CDM baseline.
 
 ![RAR Residuals](Figure_1_RAR_Residuals.png)
 
