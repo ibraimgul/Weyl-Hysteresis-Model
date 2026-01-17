@@ -1,58 +1,40 @@
-# Weyl-Hysteresis-Model
+# Non-Local Gravitational Leakage: Weyl Hysteresis Model
 
-**Non-Local Gravitational Leakage: A Scalar-Tensor Braneworld Approach to Galactic Dynamics**
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![arXiv](https://img.shields.io/badge/arXiv-2601.XXXXX-b31b1b.svg)](https://arxiv.org/)
+[![Affiliation](https://img.shields.io/badge/Affiliation-Independent%20Researcher-blue)](mailto:gulpoetika@gmail.com)
 
-This repository contains the numerical verification code and dataset for a non-local gravity model derived from a **5D Einstein-Dilaton action**. The model unifies galactic dynamics (RAR) and cluster-scale spatial offsets (Bullet Cluster) through a single geometric framework involving Lifshitz scaling and metastable bulk gravitons.
+This repository contains the numerical analysis code, data processing scripts, and the LaTeX manuscript for the paper:  
+**"Non-Local Gravitational Leakage: A Spectral Propagator Ansatz for Galactic Dynamics and Cluster Offsets"**
 
----
+## 🌌 Overview
 
-## 🌌 Abstract & Theory
-We propose a UV-complete non-local gravity model where the anomalous scaling of the graviton propagator arises from a **bulk dilaton field** $\phi$. This generates a non-AdS (Lifshitz) background geometry that modifies the Kaluza-Klein spectral density.
-
-### Key Theoretical Mechanisms
-1.  **Lifshitz Scaling via Dilaton**: The transition index $n$ is not arbitrary but fixed by the bulk scalar coupling $\gamma$:
-    $$ds^2 = \left(\frac{L}{z}\right)^{2\delta} (\eta_{\mu\nu} dx^\mu dx^\nu - dz^2), \quad n = 2\delta - 1$$
-
-2.  **Volcano Potential & Tunneling**: The Bullet Cluster offset is explained not by superluminal travel, but by the **WKB tunneling time** ($\tau$) of metastable gravitons through the effective potential barrier $V_{eff}(z)$ created by the brane.
-
----
-
-## 📊 Key Results
-
-### 1. Galactic Dynamics (SPARC)
-Bayesian MCMC inference on **140 high-quality SPARC galaxies** ($i > 30^\circ, Q \le 2$) yields:
-* **Transition Index:** $n = 1.46 \pm 0.05$
-* **Implied Lifshitz Exponent:** $\delta \approx 1.23$ (Deviates from standard AdS $\delta=1$)
-* **Leakage Scale:** $a_5 \approx 1.2 \times 10^{-10} \text{ m/s}^2$
-* **Parsimony:** $\Delta \text{BIC} \approx 18.2$ preference over $\Lambda$CDM+NFW.
-
-![RAR Residuals](Figure_1_RAR_Residuals.png)
-
-### 2. Bullet Cluster Constraint
-The observed **250 kpc** offset is reconciled via the decay width of the bulk resonance:
-* **Tunneling Time:** $\tau \approx 52 \text{ Myr}$
-* **Stability:** The model satisfies the Breitenlohner-Freedman bound ($m^2 \ge -4k^2$) and maintains subluminal signal propagation ($v_g < c$).
-
-![Bullet Offset](Figure_4_Bullet_Offset.png)
+This project proposes a UV-complete non-local gravity model derived from a 5D Einstein-Dilaton action within the **Dark Dimension (Swampland)** framework. By utilizing a spectral propagator approach, we provide a unified resolution to:
+1. **Galactic Dynamics:** Explaining the Radial Acceleration Relation (RAR) with $n=1.46 \pm 0.05$ ($3.81\sigma$ significance over MOND).
+2. **Cosmological Tensions:** Resolving the $S_8$ tension ($S_8 \approx 0.78$) via scale-dependent structure growth suppression.
+3. **Cluster Offsets:** Explaining the $\approx 200$ kpc offset in the Bullet Cluster (1E 0657-56) through Weyl Hysteresis (Wigner time delay).
 
 ---
 
-## 📂 Repository Structure
+## 🚀 Key Scientific Results
 
-* `analyze.py`: Python script for verification of Lifshitz scaling parameters, BF stability bounds, and tunneling time consistency.
-* `SPARC_Q2.csv`: Processed dataset of 140 galaxies used in the MCMC fit.
-* `main.tex`: Source code of the manuscript (RevTeX 4.2).
-* `figures/`: High-resolution plots used in the paper.
+| Parameter | Value | Significance |
+|-----------|-------|--------------|
+| Transition Index ($n$) | $1.46 \pm 0.05$ | $3.81\sigma$ over $n=1$ |
+| $S_8$ Prediction | $0.78 \pm 0.02$ | Alleviates KiDS/DES Tension |
+| Bullet Offset | $\approx 200$ kpc | Explained via $\Gamma \approx 10^{-31}$ eV |
+| Bayes Factor ($\ln \mathcal{B}$) | $6.4$ | Decisive Evidence vs $\Lambda$CDM |
 
 ---
 
-## 🛠 Usage
+## 🛠️ Installation & Usage
 
-To reproduce the theoretical consistency checks:
+### Prerequisites
+- Python 3.8+
+- Requirements: `numpy`, `matplotlib`, `seaborn`, `pandas`, `scipy`
+
+### Quick Start: Generate Scientific Figures
+To reproduce the figures presented in the manuscript, run the following command:
 
 ```bash
-# Clone the repository
-git clone [https://github.com/ibraimgul/Weyl-Hysteresis-Model.git](https://github.com/ibraimgul/Weyl-Hysteresis-Model.git)
-
-# Run the verification script
 python analyze.py
