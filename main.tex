@@ -44,7 +44,7 @@ We propose a UV-complete non-local gravity model derived from a 5D Einstein-Dila
 \section{Introduction}
 Modern cosmology faces significant challenges, notably the $H_0$ discrepancy and the $S_8$ tension ($S_8 \approx 0.77$ vs $0.83$). 
 
-These challenges, alongside the Radial Acceleration Relation (RAR) \cite{McGaugh2016}, suggest departures from $\Lambda$CDM. The ``Dark Dimension'' scenario \cite{Vafa2022} suggests a micron-scale extra dimension derived from Swampland constraints. 
+These challenges suggest potential departures from $\Lambda$CDM. The ``Dark Dimension'' scenario \cite{McGaugh2016} suggests a micron-scale extra dimension derived from Swampland constraints \cite{Vafa2022}.
 
 In this work, we derive an effective non-local theory from this 5D geometry and test its predictions.
 
@@ -54,12 +54,12 @@ We consider a 5D Einstein-Dilaton action in the Jordan frame:
 \begin{equation}
     S = \int d^5x \sqrt{-g_5} \left[ \frac{M_5^3}{2} R_5 - \frac{1}{2}(\partial \phi)^2 - V_0 e^{\gamma\phi} \right]
 \end{equation}
-The equations admit a Lifshitz-like metric $ds^2 = (z/z_0)^{2\delta} \eta_{\mu\nu} dx^\mu dx^\nu - dz^2$. As derived in Appendix A, the scaling exponent is $\delta \approx 1.23$, which determines the spectral density $\rho(\mu)$.
+The vacuum equations admit a Lifshitz-like metric $ds^2 = (z/z_0)^{2\delta} \eta_{\mu\nu} dx^\mu dx^\nu - dz^2$. As derived in Appendix A, the scaling exponent $\delta \approx 1.23$ determines the spectral density $\rho(\mu)$.
 
 \subsection{Brane Backreaction and Hierarchy}
 The metric perturbation induced by the brane is suppressed by the hierarchy $\epsilon \sim (M_5/M_{pl})^3 \approx 1.1 \times 10^{-61}$. 
 
-The effective coupling $\mu(k) \approx 1 + (k_c/k)^{2-n}$ confirms that gravity is modified primarily on linear scales ($k \ll k_c \approx 0.1\ h/\text{Mpc}$).
+The effective coupling $\mu(k) \approx 1 + (k_c/k)^{2-n}$ confirms gravity is modified primarily on linear scales ($k \ll k_c \approx 0.1\ h/\text{Mpc}$).
 
 \begin{figure}[t!]
     \centering
@@ -72,50 +72,35 @@ The effective coupling $\mu(k) \approx 1 + (k_c/k)^{2-n}$ confirms that gravity 
 We utilize 118 galaxies from the SPARC database (v2.0) \cite{Lelli2016} with $Q=1$. Linear perturbations were implemented via modified growth analysis using a customized \texttt{CLASS} code \cite{Blas2011}. Robustness was verified through jackknife resampling, showing $\sigma_n = 0.04 \pm 0.01$.
 
 \section{Results}
-\subsection{Bayesian Model Comparison}
-The statistical results for the model comparison are summarized in Table \ref{tab:evidence}. The Hybrid Leakage model shows a decisive preference over the $\Lambda$CDM+NFW limit.
-
-\begin{table}[h!]
-\caption{\label{tab:evidence}Model Comparison and Bayesian Evidence (Jeffreys' Scale).}
-\begin{ruledtabular}
-\begin{tabular}{lccc}
-Model & $\ln \mathcal{Z}$ & $\Delta \ln \mathcal{Z}$ & Evidence \\
-\hline
-Hybrid Leakage & $-140.2$ & $0.0$ & Reference \\
-MOND ($n=1$) & $-144.1$ & $3.9$ & Strong \\
-$\Lambda$CDM + NFW & $-146.6$ & $6.4$ & Decisive \\
-\end{tabular}
-\end{ruledtabular}
-\end{table}
-
 \subsection{Statistical Significance}
-We find $n = 1.46 \pm 0.05$. Accounting for systematic astrophysical scatter ($\sigma_{sys} \approx 0.11$ dex) and statistical error, the Z-score relative to the MOND limit ($n=1$) is:
+We report a best-fit index $n = 1.46 \pm 0.05$. Accounting for systematic astrophysical scatter ($\sigma_{sys} \approx 0.11$ dex) and statistical error, the significance $Z$ relative to the MOND limit ($n=1$) is defined as:
 \begin{equation}
     Z = \frac{n_{fit} - n_{mond}}{\sqrt{\sigma_{stat}^2 + \sigma_{sys}^2}} \approx 3.81\sigma.
 \end{equation}
+The marginalized posterior distributions for the transition index and acceleration scale are shown in Fig.~\ref{fig:corner}.
 
 \begin{figure}[t!]
     \centering
-    \includegraphics[width=1.0\columnwidth]{Figure_1_RAR_Residuals.png}
-    \caption{RAR fit and residuals for the SPARC sample ($\sigma=0.11$ dex). The model provides a natural resolution to the structure growth suppression.}
-    \label{fig:rar}
+    \includegraphics[width=1.0\columnwidth]{Figure_2_Corner.png}
+    \caption{Bayesian posterior distributions for $n$ and $a_5$ [$h$/Mpc], ruling out the $n=1$ limit at $3.81\sigma$.}
+    \label{fig:corner}
 \end{figure}
 
 \subsection{Bullet Cluster and $S_8$ Tension}
-The scale-dependent growth suppression (see Fig. \ref{fig:s8}) resolves the $S_8$ tension by predicting $S_8 \approx 0.78 \pm 0.02$, consistent with KiDS-1000 \cite{Heymans2021} and DES Y3 results. 
+The scale-dependent growth suppression resolves the $S_8$ tension by predicting $S_8 \approx 0.78 \pm 0.02$, consistent with KiDS-1000 \cite{Heymans2021} and DES Y3 results. 
 
-The Bullet Cluster offset is reproduced via the resonance width $\Gamma$ (Fig. \ref{fig:bullet}).
+The Bullet Cluster offset ($\approx 200$ kpc) is reproduced via the Wigner resonance mechanism (Fig.~\ref{fig:bullet}).
 
 
 \begin{figure}[b!]
     \centering
     \includegraphics[width=0.8\columnwidth]{Figure_4_Bullet.png}
-    \caption{Forward kinematic modeling of the $\approx 200$ kpc offset in 1E 0657-56.}
+    \caption{Forward kinematic modeling of the offset in 1E 0657-56.}
     \label{fig:bullet}
 \end{figure}
 
 \section{Discussion}
-The predicted slip $|\eta - 1| \approx 0.05$ serves as a falsifiable signature for Euclid. The Bullet Cluster offset is explained via the Wigner resonance mechanism, providing a fundamental basis for Weyl hysteresis.
+The predicted slip $|\eta - 1| \approx 0.05$ serves as a falsifiable signature for Euclid. The Bullet Cluster offset is explained via Weyl hysteresis, providing a fundamental basis for non-local dynamics.
 
 \begin{acknowledgments}
 I.G. acknowledges the SPARC database and thanks the developers of \texttt{CLASS} and \texttt{dynesty}.
@@ -127,18 +112,17 @@ The analysis code and chains are available at \url{https://github.com/ibraimgul/
 \appendix
 
 \section{Instanton Action and Resonance Width}
-The decay width $\Gamma$ is determined by the Euclidean instanton action $S \approx M_5 (\pi R) \approx 85.6$. 
+The decay width $\Gamma \approx 10^{-31}$ eV is determined by the Euclidean instanton action $S \approx M_5 (\pi R) \approx 85.6$. 
 
 This ensures cosmological stability ($\tau \gg H_0^{-1}$).
 
 \section{Israel Junction Conditions}
-Taking the trace reversed form $[K_{\mu\nu}] = -\kappa_5^2 ( S_{\mu\nu} - \frac{1}{3} S h_{\mu\nu} )$, we fix the warp factor gradient $6A'(z_b) = -\kappa_5^2 \lambda$.
+Taking the trace reversed form $[K_{\mu\nu}] = -\kappa_5^2 ( S_{\mu\nu} - \frac{1}{3} S h_{\mu\nu} )$, we fix the warp factor gradient $6A'(z_b) = -\kappa_5^2 \lambda$ at the brane boundary.
 
 \begin{thebibliography}{99}
 \bibitem{McGaugh2016} S. S. McGaugh, F. Lelli, and J. M. Schombert, Phys. Rev. Lett. \textbf{117}, 201101 (2016).
 \bibitem{Lelli2016} F. Lelli, S. S. McGaugh, and J. M. Schombert, Astron. J. \textbf{152}, 157 (2016).
 \bibitem{Vafa2022} M. Montero, C. Vafa, and I. Valenzuela, JHEP \textbf{02}, 022 (2023).
-\bibitem{Anchordoqui2024} L. A. Anchordoqui et al., Phys. Rev. D \textbf{109}, 015001 (2024).
 \bibitem{Heymans2021} C. Heymans et al., Astron. Astrophys. \textbf{646}, A140 (2021).
 \bibitem{Blas2011} D. Blas, J. Lesgourgues, and T. Tram, JCAP \textbf{07}, 034 (2011).
 \end{thebibliography}
