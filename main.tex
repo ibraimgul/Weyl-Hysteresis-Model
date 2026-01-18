@@ -10,7 +10,7 @@
 \usepackage[dvipsnames]{xcolor}
 \usepackage{orcidlink} % ORCID logo
 \usepackage{booktabs}  % Professional tables
-\usepackage{microtype} % "Underfull \hbox" uyarılarını profesyonelce çözer (Sloppy kullanma!)
+\usepackage{microtype} % Tipografi ve satır taşmalarını düzeltir
 
 % --- HYPERLINK SETTINGS ---
 \hypersetup{
@@ -27,7 +27,6 @@
 % --- METADATA ---
 \title{Non-Local Gravitational Leakage: A Spectral Propagator Ansatz from the Dark Dimension}
 
-% --- ORCID EKLENDİ ---
 \author{Ibrahim Gül \orcidlink{0009-0003-0078-751X}}
 \email{gulpoetika@gmail.com}
 \affiliation{Independent Researcher, Ankara, Türkiye}
@@ -35,10 +34,9 @@
 \date{\today}
 
 \begin{abstract}
-We present a first-principles derivation of non-local gravity embedded in a 5D Einstein-Dilaton "Dark Dimension" framework. We explicitly solve the bulk field equations, identifying tensor perturbations as Bessel modes with a spectral density $\rho(m) \sim m^{2\nu-1}$. We resolve the hierarchy problem by linking the leakage scale to the Species Scale ($N \sim 10^{30}$), yielding a geometric suppression $\epsilon \sim 10^{-61}$. Analyzing 118 SPARC galaxies ($Q=1$) with a robust Bayesian likelihood (including Log-Normal M/L priors and sensitivity checks), we find decisive evidence against MOND ($n=1$) with a significance of $Z \approx 3.81\sigma$. The Bullet Cluster offset is explained via a WKB tunneling delay ($\Delta \tau \approx 40 \pm 8$ Myr) consistent with weak lensing maps, and we derive the modified growth equation predicting $S_8 = 0.78 \pm 0.03$.
+We present a first-principles derivation of non-local gravity embedded in a 5D Einstein-Dilaton "Dark Dimension" framework. We explicitly solve the bulk field equations, identifying tensor perturbations as Bessel modes with a spectral density $\rho(m) \sim m^{2\nu-1}$. We resolve the hierarchy problem by linking the leakage scale to the Species Scale ($N \sim 10^{30}$), yielding a geometric suppression $\epsilon \sim 10^{-61}$. Analyzing 118 SPARC galaxies ($Q=1$) with a robust Bayesian likelihood, we find decisive evidence against MOND ($n=1$) with a significance of $Z \approx 3.81\sigma$. The model achieves a remarkable goodness-of-fit with a reduced chi-squared $\chi^2_\nu \approx 0.86$ and negligible bias ($-0.01$ dex). The Bullet Cluster offset is explained via a WKB tunneling delay ($\Delta \tau \approx 40 \pm 8$ Myr), and we derive the modified growth equation predicting $S_8 = 0.78 \pm 0.03$.
 \end{abstract}
 
-% PACS kept for archival purposes
 \pacs{04.50.Kd, 98.62.Dm, 95.30.Sf, 98.80.Es}
 \keywords{Modified Gravity, Dark Dimension, Spectral Propagator, Galactic Dynamics}
 
@@ -98,7 +96,8 @@ The Gaussian log-likelihood marginalizes over stellar Mass-to-Light ratios ($\Up
 \subsection{Parameter Constraints}
 The posterior summary is shown in Table~\ref{tab:posterior} and Fig.~\ref{fig:corner}.
 
-% --- TABLE 1 ---
+\textbf{RAR Fit Quality:} The analysis demonstrates a high consistency between the Hybrid Leakage prediction and observations. The residuals show a negligible systematic bias of $-0.01$ dex and an RMS scatter of $0.10$ dex, which is consistent with the intrinsic observational scatter ($\sigma_{tot} \approx 0.11$ dex). The overall reduced chi-squared value is $\chi^2_\nu = 0.86$, indicating that the model captures the galactic dynamics essentially within the limits of observational uncertainty.
+
 \begin{table}[t!]
 \caption{\label{tab:posterior}Posterior summary (median and 68\% C.L.).}
 \begin{ruledtabular}
@@ -121,7 +120,6 @@ Leakage Scale $\log_{10}(a_5)$ & $-0.85$ & $^{+0.18}_{-0.22}$ \\
 \subsection{Model Comparison}
 The Bayes factor is converted to significance following Kass \& Raftery~\cite{Kass1995}.
 
-% --- TABLE 2 ---
 \begin{table}[t!]
 \caption{\label{tab:combined}Model Comparison.}
 \begin{ruledtabular}
