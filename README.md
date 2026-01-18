@@ -1,37 +1,33 @@
-# Non-Local Gravitational Leakage: Weyl Hysteresis Model
+# Non-Local Gravitational Leakage: A Spectral Propagator Ansatz from the Dark Dimension
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Affiliation](https://img.shields.io/badge/Affiliation-Independent%20Researcher-blue)](mailto:gulpoetika@gmail.com)
-[![Python](https://img.shields.io/badge/Python-3.8%2B-brightgreen)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![arXiv](https://img.shields.io/badge/arXiv-240X.XXXXX-b31b1b.svg)](https://arxiv.org/)
+[![Status](https://img.shields.io/badge/Status-Submitted-green.svg)]()
 
-This repository contains the numerical analysis code, data processing scripts, and the LaTeX manuscript for the paper:  
-**"Non-Local Gravitational Leakage: A Spectral Propagator Ansatz for Galactic Dynamics and Cluster Offsets"**
+**Author:** Ibrahim Gul  
+**Correspondence:** [gulpoetika@gmail.com](mailto:gulpoetika@gmail.com)
 
-## 🌌 Overview
+## 📌 Overview
 
-This project proposes a UV-complete non-local gravity model derived from a 5D Einstein-Dilaton action within the **Dark Dimension (Swampland)** framework. By utilizing a spectral propagator approach, we provide a unified resolution to three major cosmological puzzles:
+This repository contains the numerical analysis pipeline, data subsets, and plotting scripts for the paper **"Non-Local Gravitational Leakage: A Spectral Propagator Ansatz from the Dark Dimension"**.
 
-1. **Galactic Dynamics:** Explaining the Radial Acceleration Relation (RAR) with $n=1.46 \pm 0.05$ (ruling out the MOND limit at $3.81\sigma$).
-2. **Cosmological Tensions:** Resolving the $S_8$ tension ($S_8 \approx 0.78$) via scale-dependent growth suppression of density perturbations.
-3. **Cluster Offsets:** Explaining the $\approx 200$ kpc offset in the Bullet Cluster (1E 0657-56) through Weyl Hysteresis (Wigner time delay).
+We investigate a UV-motivated modified gravity model embedded within a 5D Einstein-Dilaton framework. This code reproduces the key results of the paper, including:
+1.  **Galactic Dynamics:** Bayesian inference on SPARC galaxies favoring the leakage model ($Z \approx 3.81\sigma$).
+2.  **Bullet Cluster:** WKB tunneling calculations explaining the ~200 kpc offset.
+3.  **Cosmology:** Modified growth structure predicting $S_8 \approx 0.78$.
 
----
+## 📂 Repository Structure
 
-## 🚀 Key Scientific Results
+* `analyze.py`: Main analysis script performing Bayesian inference (Nested Sampling) on galaxy data.
+* `generate_final_figures.py`: Script to reproduce Figures 1-5 as seen in the manuscript.
+* `data/`: Contains the processed SPARC subset (`sparc_subset_118.csv`).
+* `chains/`: Contains posterior chain files from `dynesty`.
+* `class_mu_patch.diff`: Diff file to patch the Boltzmann code `CLASS` for non-local gravity (optional for reproduction of cosmological plots).
 
-| Parameter | Value (SPARC $Q=1$, $N=118$) | Significance / Alignment |
-|-----------|------------------------------|--------------------------|
-| **Transition Index ($n$)** | $1.46 \pm 0.05$ | $3.81\sigma$ over $n=1$ (MOND) |
-| **$S_8$ Prediction** | $0.78 \pm 0.02$ | Alleviates KiDS-1000/DES Tension |
-| **Bullet Offset** | $\approx 200$ kpc | Explained via $\Gamma \approx 10^{-31}$ eV |
-| **Bayes Factor ($\ln \mathcal{B}$)** | $6.4$ | Decisive Evidence vs $\Lambda$CDM |
-
----
-
-## 🛠️ Installation & Usage
+## 🚀 Installation & Usage
 
 ### Prerequisites
-Ensure you have Python 3.8 or higher installed. You can install all required dependencies using the following command:
+The analysis requires Python 3.8+ and the following libraries:
 
 ```bash
 pip install -r requirements.txt
