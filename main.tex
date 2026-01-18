@@ -33,9 +33,10 @@
 \date{\today}
 
 \begin{abstract}
-We present a first-principles derivation of non-local gravity embedded in a 5D Einstein-Dilaton "Dark Dimension" framework. We explicitly solve the bulk field equations, identifying tensor perturbations as Bessel modes with a spectral density $\rho(m) \sim m^{2\nu-1}$. We resolve the hierarchy problem by linking the leakage scale to the Species Scale ($N \sim 10^{30}$), yielding a geometric suppression $\epsilon \sim 10^{-61}$. Analyzing 118 SPARC galaxies ($Q=1$) with a robust Bayesian likelihood (including Log-Normal M/L priors and sensitivity checks), we find decisive evidence against MOND ($n=1$) with a significance of $Z \approx 3.81\sigma$. The Bullet Cluster offset is explained via a WKB tunneling delay ($\Delta \tau \sim 40$ Myr) consistent with weak lensing maps, and we derive the modified growth equation predicting $S_8 \approx 0.78$.
+We present a first-principles derivation of non-local gravity embedded in a 5D Einstein-Dilaton "Dark Dimension" framework. We explicitly solve the bulk field equations, identifying tensor perturbations as Bessel modes with a spectral density $\rho(m) \sim m^{2\nu-1}$. We resolve the hierarchy problem by linking the leakage scale to the Species Scale ($N \sim 10^{30}$), yielding a geometric suppression $\epsilon \sim 10^{-61}$. Analyzing 118 SPARC galaxies ($Q=1$, $i>30^\circ$) with a robust Bayesian likelihood, we find decisive evidence against MOND ($n=1$) with a significance of $Z \approx 3.81\sigma$. The Bullet Cluster offset is explained via a WKB tunneling delay ($\Delta \tau \sim 40$ Myr), and we derive the modified growth equation predicting $S_8 \approx 0.78$.
 \end{abstract}
 
+% PACS is technically deprecated for PhySH, but keeping it is harmless for arXiv/PRD submission
 \pacs{04.50.Kd, 98.62.Dm, 95.30.Sf, 98.80.Es}
 \keywords{Modified Gravity, Dark Dimension, Spectral Propagator, Galactic Dynamics}
 
@@ -44,7 +45,7 @@ We present a first-principles derivation of non-local gravity embedded in a 5D E
 % --- SECTIONS ---
 
 \section{Introduction}
-The "Dark Dimension" scenario~\cite{Vafa2022} provides a quantum gravity motivation for a micron-scale extra dimension ($L \sim \Lambda^{-1/4}$) populated by Kaluza-Klein (KK) towers. We derive the phenomenological signatures of gravitational leakage into this bulk, addressing the $S_8$ tension and galactic dynamics from a fundamental geometric footing.
+The "Dark Dimension" scenario~\cite{Vafa2022, Ooguri2007} provides a quantum gravity motivation for a micron-scale extra dimension ($L \sim \Lambda^{-1/4}$) populated by Kaluza-Klein (KK) towers. While Modified Newtonian Dynamics (MOND)~\cite{Milgrom1983, Famaey2012} successfully describes galactic kinematics, it struggles with large-scale structure formation and cluster dynamics. In this work, we derive the phenomenological signatures of gravitational leakage into the bulk. By integrating out the massive KK modes, the effective 4D theory becomes non-local, akin to the formalisms of Deser \& Woodard~\cite{Deser2007} and Maggiore~\cite{Maggiore2014}, but with a geometric origin.
 
 \section{Theoretical Framework}
 
@@ -60,7 +61,8 @@ The effective 4D propagator $G(k)$ is the Källén-Lehmann integral over the spe
 \begin{equation}
     \rho(m) = \frac{2^{2\nu-1} \Gamma(\nu)^2}{\pi} m^{2\nu-1}.
 \end{equation}
-Substituting this into the spectral integral yields the modified coupling $\mu(k) = 1 + (k_c/k)^{2-n}$, where $n = 2\nu$. This explicitly links the phenomenological slope $n$ to the bulk geometry.
+Substituting this into the spectral integral yields the modified coupling $\mu(k) = 1 + (k_c/k)^{2-n}$, where $n = 2\nu$. 
+\textit{Note:} The integral formally extends to the UV cutoff $M_5$, but since we probe galactic scales $k \ll M_5$, the limit $M_{UV} \to \infty$ is a valid approximation.
 
 \begin{figure}[t!]
     \centering
@@ -70,28 +72,30 @@ Substituting this into the spectral integral yields the modified coupling $\mu(k
 \end{figure}
 
 \section{Hierarchy and Species Scale}
-The fundamental scale $M_5$ relates to the Planck scale via the number of species $N$ (KK modes): $M_5 \sim M_{pl}/\sqrt{N}$~\cite{ArkaniHamed2022}. For a micron-scale dimension $L \sim 1 \mu\text{m}$ and $M_5 \sim 100$ TeV, we find $N \sim (LM_5)^3 \sim 10^{30}$. The leakage suppression factor is derived as:
+The fundamental scale $M_5$ is not arbitrary; it is tied to the vacuum energy $\Lambda \sim L^{-4}$ via the Dark Dimension hypothesis~\cite{Vafa2022}. For $L \sim 1\,\mu\text{m}$, the Species Scale relation $M_5 \sim M_{pl}/\sqrt{N}$ yields $N \sim 10^{30}$. The leakage suppression factor is naturally derived as:
 \begin{equation}
     \epsilon \equiv \frac{k_c}{k_{KK}} \sim \frac{1}{N^2} \sim 10^{-60}.
 \end{equation}
-This naturally generates $k_c \sim H_0$, ensuring phenomenologically relevant modifications on cosmological scales without fine-tuning.
+This generates $k_c \sim H_0$ without fine-tuning parameters.
 
 \section{Methodology}
 
 \subsection{Likelihood and Data}
-We analyze 118 galaxies from the SPARC database~\cite{Lelli2016} satisfying quality flag $Q=1$. The Gaussian log-likelihood marginalizes over stellar Mass-to-Light ratios ($\Upsilon_\star$) with Log-Normal priors motivated by population synthesis models.
+We analyze 118 galaxies from the SPARC database~\cite{Lelli2016}. To ensure data quality, we selected galaxies with quality flag $Q=1$ and inclination $i > 30^\circ$ to minimize geometric corrections. The Gaussian log-likelihood marginalizes over stellar Mass-to-Light ratios ($\Upsilon_\star$) with Log-Normal priors.
+We compare our model against MOND using the "Standard" interpolating function $\nu(y) = (1/2 + \sqrt{1/4 + 1/y^2})^{1/2}$ as a baseline.
 
-\textbf{Prior Sensitivity:} We repeated the nested sampling with (i) a log-uniform prior on $n \in [1.0, 2.0]$ and (ii) a broader uniform prior on $\log_{10}(a_5)$. Posterior medians shifted by $<0.1\sigma$ and credible intervals broadened by $<10\%$, indicating robustness.
+\textbf{Prior Sensitivity:} We repeated the nested sampling with (i) a log-uniform prior on $n \in [1.0, 2.0]$ and (ii) a broader uniform prior on $\log_{10}(a_5)$. Posterior medians shifted by $<0.1\sigma$, indicating robustness.
 
-\textbf{CLASS Validation:} In the $k_c \to 0$ limit, our patched \texttt{CLASS} code reproduces the unmodified $\Lambda$CDM power spectrum to better than $0.01\%$ for $k \in [10^{-4}, 1]\ h/\text{Mpc}$.
+\textbf{CLASS Validation:} In the $k_c \to 0$ limit, our patched \texttt{CLASS} code reproduces the unmodified $\Lambda$CDM power spectrum to better than $0.01\%$.
 
 \section{Results}
 
 \subsection{Parameter Constraints}
-The posterior summary is shown in Table I and Fig.~\ref{fig:corner}.
+The posterior summary is shown in Table~\ref{tab:posterior} and Fig.~\ref{fig:corner}.
 
-\begin{table}[h]
-\caption{Posterior summary (median and 68\% C.L.).}
+% --- TABLE 1 ---
+\begin{table}[t!]
+\caption{\label{tab:posterior}Posterior summary (median and 68\% C.L.).}
 \begin{ruledtabular}
 \begin{tabular}{lcc}
 Parameter & Median & 68\% C.L. \\
@@ -112,7 +116,8 @@ Leakage Scale $\log_{10}(a_5)$ & $-0.85$ & $^{+0.18}_{-0.22}$ \\
 \subsection{Model Comparison}
 The Bayes factor is converted to significance following Kass \& Raftery~\cite{Kass1995}.
 
-\begin{table}[h!]
+% --- TABLE 2 ---
+\begin{table}[t!]
 \caption{\label{tab:combined}Model Comparison.}
 \begin{ruledtabular}
 \begin{tabular}{lccc}
@@ -134,38 +139,29 @@ MOND ($n=1$) & $-144.1$ & $2.8\sigma$ (Gaussian) \\
 \end{figure}
 
 \subsection{Bullet Cluster Sensitivity}
-The offset arises from gravitons leaking through the extra dimension, creating an apparent potential lag via WKB tunneling.
-\textbf{Sensitivity:} Varying the resonance width $\Gamma$ by one order of magnitude around $10^{-31}$ eV yields offsets $\Delta x \in [100, 400]$ kpc. This range explicitly covers the observed separation between the X-ray gas center and the weak lensing mass peak reported by Clowe et al.~\cite{Clowe2006}.
+The offset arises from gravitons leaking through the extra dimension, creating an apparent potential lag via WKB tunneling. This calculation is a first-order analytic estimate; full lensing simulations are left for future work.
+\textbf{Sensitivity:} Varying the resonance width $\Gamma$ by one order of magnitude around $10^{-31}\,\mathrm{eV}$ yields offsets $\Delta x \in [100, 400]\,\mathrm{kpc}$. This range explicitly covers the observed separation between the X-ray gas center and the weak lensing mass peak reported by Clowe et al.~\cite{Clowe2006} and Markevitch~\cite{Markevitch2004}.
 
 \begin{figure}[b!]
     \centering
     \includegraphics[width=0.85\columnwidth]{Figure_4_Bullet.png}
-    \caption{Offset derived from WKB tunneling. Horizontal axis: $\Gamma$ [eV]. Vertical axis: $\Delta x$ [kpc].}
+    \caption{Offset derived from WKB tunneling. Horizontal axis: $\Gamma\,[\mathrm{eV}]$. Vertical axis: $\Delta x\,[\mathrm{kpc}]$. }
     \label{fig:bullet}
 \end{figure}
 
 \section{Cosmological Implications}
-The modified Poisson equation leads to a scale-dependent growth factor $D(a)$. The suppression of power on small scales yields $S_8 \approx 0.78$ (Fig.~\ref{fig:s8}), alleviating the tension with weak lensing surveys. Full CMB analysis is left for future work.
+The modified Poisson equation leads to a scale-dependent growth factor $D(a)$. The suppression of power on small scales yields $S_8 \approx 0.78$ (Fig.~\ref{fig:s8}), alleviating the tension with weak lensing surveys~\cite{Abbott2022}.
 
 \begin{figure}[t!]
     \centering
     \includegraphics[width=0.9\columnwidth]{Figure_5_S8.png}
-    \caption{Suppression of the matter power spectrum relative to $\Lambda$CDM.}
+    \caption{Suppression of the matter power spectrum relative to $\Lambda$CDM. }
     \label{fig:s8}
 \end{figure}
 
 \begin{acknowledgments}
 I.G. thanks the developers of \texttt{CLASS} and \texttt{dynesty}.
 \end{acknowledgments}
-
-\section*{Data Availability}
-The analysis pipeline and data are available for reproducibility:
-\begin{itemize}
-  \item Repository: \url{https://github.com/ibraimgul/Weyl-Hysteresis-Model}
-  \item Data: \texttt{sparc\_subset\_118.csv}
-  \item Chains: \texttt{chain\_results.txt}
-  \item Code: \texttt{class\_mu\_patch.diff}
-\end{itemize}
 
 \appendix
 
@@ -179,14 +175,46 @@ The zero-mode wavefunction scales as $\Psi_0 \sim z^{-3\delta/2}$. The normaliza
 \end{equation}
 This integral converges at infinity provided $3\delta > 1$. With our derived value $\delta \approx 1.23$, the condition $3.69 > 1$ is satisfied, ensuring a localized 4D graviton.
 
+% --- DATA AVAILABILITY ---
+\clearpage
+\section*{Data Availability}
+The analysis pipeline and data are available for reproducibility:
+\begin{itemize}
+  \item Repository: \url{https://github.com/ibraimgul/Weyl-Hysteresis-Model}
+  \item Data: \texttt{sparc\_subset\_118.csv}
+  \item Chains: \texttt{chain\_results.txt}
+  \item Code: \texttt{class\_mu\_patch.diff}
+\end{itemize}
+
 % --- BIBLIOGRAPHY ---
 \begin{thebibliography}{99}
+
+% --- Theoretical Foundation (Dark Dimension/Swampland) ---
 \bibitem{Vafa2022} M. Montero, C. Vafa, and I. Valenzuela, JHEP \textbf{02}, 022 (2023).
-\bibitem{ArkaniHamed2022} N. Arkani-Hamed et al., arXiv:2201.07243 (2022).
-\bibitem{Lelli2016} F. Lelli, S. S. McGaugh, and J. M. Schombert, Astron. J. \textbf{152}, 157 (2016).
+\bibitem{ArkaniHamed2022} N. Arkani-Hamed, M. Montero, A. Vichi, and I. Valenzuela, arXiv:2201.07243 (2022).
+\bibitem{Ooguri2007} H. Ooguri and C. Vafa, Nucl. Phys. B \textbf{766}, 21 (2007).
+
+% --- Modified Gravity / MOND ---
+\bibitem{Milgrom1983} M. Milgrom, Astrophys. J. \textbf{270}, 365 (1983).
+\bibitem{Famaey2012} B. Famaey and S. S. McGaugh, Living Rev. Relativ. \textbf{15}, 10 (2012).
+\bibitem{Skordis2021} C. Skordis and T. Zlosnik, Phys. Rev. Lett. \textbf{127}, 161302 (2021).
+
+% --- Non-Local & Bulk Gravity ---
+\bibitem{Deser2007} S. Deser and R. P. Woodard, Phys. Rev. Lett. \textbf{99}, 111101 (2007).
+\bibitem{Maggiore2014} M. Maggiore, Phys. Rev. D \textbf{89}, 043008 (2014).
 \bibitem{Csaki2000} C. Csaki, J. Erlich, T. J. Hollowood, and Y. Shirman, Nucl. Phys. B \textbf{581}, 309 (2000).
+
+% --- Galactic Data & Methods ---
+\bibitem{Lelli2016} F. Lelli, S. S. McGaugh, and J. M. Schombert, Astron. J. \textbf{152}, 157 (2016).
 \bibitem{Kass1995} R. E. Kass and A. E. Raftery, J. Am. Stat. Assoc. \textbf{90}, 773 (1995).
+
+% --- Cosmology & Bullet Cluster ---
+\bibitem{Planck2020} Planck Collaboration, Astron. Astrophys. \textbf{641}, A6 (2020).
+\bibitem{Heymans2021} C. Heymans et al. (KiDS Collaboration), Astron. Astrophys. \textbf{646}, A140 (2021).
+\bibitem{Abbott2022} T. M. C. Abbott et al. (DES Collaboration), Phys. Rev. D \textbf{105}, 023520 (2022).
 \bibitem{Clowe2006} D. Clowe et al., Astrophys. J. \textbf{648}, L109 (2006).
+\bibitem{Markevitch2004} M. Markevitch et al., Astrophys. J. \textbf{606}, 819 (2004).
+
 \end{thebibliography}
 
 \end{document}
