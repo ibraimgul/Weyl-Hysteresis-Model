@@ -1,12 +1,12 @@
 --- source/perturbations.c
 +++ source/perturbations.c
 @@ -1024,6 +1024,25 @@
-   /* STANDARD GR TERM */
-   delta_rho = (rho_plus_p * theta + (rho + p) * sigma) / k2;
+    /* STANDARD GR TERM */
+    delta_rho = (rho_plus_p * theta + (rho + p) * sigma) / k2;
  
 +  /* ----------------------------------------------------------------- */
 +  /* START MODIFICATION: Non-Local Gravitational Leakage (Ibrahim Gul) */
-+  /* Implementing spectral propagator mu(k) = 1 + (k_c/k)^(2-n)         */
++  /* Implementing spectral propagator mu(k) = 1 + (k_c/k)^(2-n)        */
 +  /* This modification accounts for the suppression of growth at       */
 +  /* late times due to gravitational leakage into the Dark Dimension.  */
 +  /* ----------------------------------------------------------------- */
@@ -27,5 +27,5 @@
 +  /* END MODIFICATION                                                  */
 +  /* ----------------------------------------------------------------- */
 +
-   /* Einstein Equations */
-   if (pba->has_ad_matter == _TRUE_) {
+    /* Einstein Equations */
+    if (pba->has_ad_matter == _TRUE_) {
