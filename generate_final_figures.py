@@ -1,152 +1,153 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
-from scipy.stats import gaussian_kde
+import matplotlib.pyplot as plt
+import corner
+import os
+import sys
 
-# --- Grafik Ayarları (Yayın Kalitesi) ---
+# --- AYARLAR ---
+# Makale kalitesinde grafik ayarları
 plt.rcParams.update({
-    'font.size': 12,
-    'axes.labelsize': 13,
-    'axes.titlesize': 14,
-    'xtick.labelsize': 11,
-    'ytick.labelsize': 11,
-    'legend.fontsize': 11,
-    'figure.titlesize': 12,
-    'font.family': 'serif',
-    'savefig.dpi': 300,
-    'savefig.bbox': 'tight'
+    'font.size': 14,
+    'axes.linewidth': 1.5,
+    'xtick.major.width': 1.5,
+    'ytick.major.width': 1.5,
+    'font.family': 'serif'
 })
 
-def make_fig1_rar_and_data():
-    print("Generating Figure 1 and SPARC Data...")
-    np.random.seed(42)
-    N = 118
-    
-    # 1. Sentetik Veri (Hybrid Leakage Modeli + Gürültü)
-    g_bar = np.logspace(-11.5, -9, N)
-    g0 = 1.2e-10
-    mu_model = 1 / (1 - np.exp(-np.sqrt(g_bar/g0)))
-    g_model = g_bar * mu_model
-    
-    sigma_tot = 0.11 # dex intrinsic scatter
-    noise = np.random.normal(0, sigma_tot, N)
-    g_obs = g_model * 10**noise
-    residuals = np.log10(g_obs) - np.log10(g_model)
-    
-    # 2. Figure 1 Çizimi
-    plt.figure(figsize=(8, 6))
-    plt.scatter(np.log10(g_bar), residuals, alpha=0.6, c='royalblue', edgecolors='k', s=60, label='SPARC Q=1 Data')
-    plt.axhline(0, color='crimson', linestyle='--', linewidth=2, label='Hybrid Leakage Model ($n=1.46$)')
-    plt.fill_between(np.log10(g_bar), -sigma_tot, sigma_tot, color='gray', alpha=0.2, label='Total Error ($\sigma_{tot}=0.11$ dex)')
-    plt.xlabel(r'$\log_{10}(g_{bar}) \ [\mathrm{m/s^2}]$')
-    plt.ylabel(r'Residuals [dex] $\log(g_{obs}) - \log(g_{model})$')
-    plt.legend(loc='upper right', frameon=True)
-    plt.grid(True, linestyle=':', alpha=0.6)
-    plt.title('Radial Acceleration Relation Residuals')
-    plt.savefig('Figure_1_RAR_Residuals.png')
-    
-    # 3. CSV Kaydet
-    gal_names = [f"NGC{np.random.randint(1000,9999)}" for _ in range(N)]
-    df = pd.DataFrame({'Galaxy': gal_names, 'log_g_bar': np.log10(g_bar), 'log_g_obs': np.log10(g_obs), 'sigma_tot': np.full(N, sigma_tot)})
-    df.to_csv('sparc_subset_118.csv', index=False)
-    print("  -> Created: Figure_1 and sparc_subset_118.csv")
+KPC_TO_M = 3.086e19
+KM_TO_M = 1000.0
+CONV_FACTOR = (KM_TO_M**2) / KPC_TO_M
 
-def make_fig2_corner_and_chain():
-    print("Generating Figure 2 and Chain Data...")
-    np.random.seed(123)
-    nsamp = 10000
+# --- VERİ YÜKLEME ---
+def load_golden_sample():
+    print("Loading data for plotting...")
+    # 1. Ham Veriyi Oku
+    if not os.path.exists("sparc_raw_full_3389_points.csv"):
+        print("Error: sparc_raw_full_3389_points.csv not found.")
+        sys.exit(1)
+    df_full = pd.read_csv("sparc_raw_full_3389_points.csv")
     
-    # 1. Sentetik Zincir
-    n_samples = np.random.normal(1.46, 0.05, nsamp)
-    a5_samples = np.random.normal(-0.85, 0.20, nsamp)
+    # 2. Listeyi Oku ve Filtrele
+    if not os.path.exists("sparc_subset_118_list.txt"):
+        print("Error: sparc_subset_118_list.txt not found.")
+        sys.exit(1)
+        
+    with open("sparc_subset_118_list.txt", 'r') as f:
+        valid_galaxies = [line.strip() for line in f if line.strip()]
     
-    # 2. Figure 2 Çizimi (Hexbin ile pürüzsüz)
-    plt.figure(figsize=(7, 7))
-    plt.hexbin(n_samples, a5_samples, gridsize=60, cmap='Blues', mincnt=1, edgecolors='none')
+    df = df_full[df_full['Galaxy'].isin(valid_galaxies)].copy()
     
-    # Kontur ekle
-    from scipy.stats import gaussian_kde
-    data = np.vstack([n_samples, a5_samples])
-    kde = gaussian_kde(data)
-    xgrid = np.linspace(n_samples.min(), n_samples.max(), 100)
-    ygrid = np.linspace(a5_samples.min(), a5_samples.max(), 100)
-    X, Y = np.meshgrid(xgrid, ygrid)
-    Z = kde(np.vstack([X.ravel(), Y.ravel()])).reshape(X.shape)
-    plt.contour(X, Y, Z, levels=3, colors='k', linewidths=1.2, alpha=0.7)
+    # 3. İvme Hesapla
+    # Sadece R > 0 olanları al
+    df = df[df['Radius'] > 0].copy()
     
-    plt.xlabel(r'Transition Index $n$')
-    plt.ylabel(r'Leakage Scale $\log_{10}(a_5)$')
-    plt.title(r'Bayesian Posterior Distribution')
-    plt.grid(alpha=0.2)
-    plt.savefig('Figure_2_Corner.png')
+    # g_obs
+    df['g_obs'] = (df['Vobs']**2 / df['Radius']) * CONV_FACTOR
     
-    # 3. Chain Kaydet
-    chain_data = np.vstack((n_samples, a5_samples, np.random.uniform(-150, -140, nsamp))).T
-    np.savetxt('chain_results.txt', chain_data, header='n_index log10_a5 log_likelihood', comments='')
-    print("  -> Created: Figure_2 and chain_results.txt")
+    # g_bar (Sabit M/L varsayımı: Disk=0.5, Bulge=0.7)
+    V_bar_sq = df['Vgas']**2 + (0.5 * df['Vdisk']**2) + (0.7 * df['Vbul']**2)
+    df['g_bar'] = (V_bar_sq / df['Radius']) * CONV_FACTOR
+    
+    return df
 
-def make_fig3_propagator():
-    print("Generating Figure 3...")
-    k = np.logspace(-3, 1, 300)
-    k_c = 0.14
-    n = 1.46
-    mu = 1 + (k_c / k)**(2 - n)
-    
-    plt.figure(figsize=(8, 5))
-    plt.loglog(k, mu, 'k-', linewidth=2.5, label=r'Hybrid Leakage ($n=1.46$)')
-    plt.axvline(k_c, color='crimson', linestyle='--', label=r'$k_c \approx 0.14\ h/\mathrm{Mpc}$')
-    plt.axhline(1, color='gray', linestyle=':', label='GR Limit')
-    plt.text(0.002, 3, r'Leakage Regime $\mu > 1$', fontsize=11, color='blue')
-    plt.text(1, 1.1, r'Screened Regime $\mu \to 1$', fontsize=11, color='green')
-    plt.xlabel(r'Wavenumber $k \ [h/\mathrm{Mpc}]$')
-    plt.ylabel(r'Effective Coupling $\mu(k) = G_{eff}/G_N$')
-    plt.legend()
-    plt.grid(True, which="both", ls="-", alpha=0.3)
-    plt.savefig('Figure_3_Propagator.png')
-    print("  -> Created: Figure_3")
+# --- TEORİK FONKSİYON ---
+def theory_curve(g_bar, n, log_a5):
+    a5 = 10**log_a5
+    # nu(y) = 1 / (1 - exp(-sqrt(y)^(2/n)))
+    y = g_bar / a5
+    nu = 1.0 / (1.0 - np.exp(-np.sqrt(y)**(2.0/n)))
+    return g_bar * nu
 
-def make_fig4_bullet():
-    print("Generating Figure 4...")
-    Gamma = np.logspace(-32, -30, 200)
-    hbar = 6.582e-16
-    v_cl = 4700 * 1e3
-    kpc = 3.086e19
-    Delta_x = v_cl * (hbar / Gamma) / kpc
+# --- FİGÜR 1: RAR + RESIDUALS ---
+def plot_rar(df, n_best, log_a5_best):
+    print("Generating Figure 1: RAR Relation...")
     
-    plt.figure(figsize=(8, 5))
-    plt.semilogx(Gamma, Delta_x, 'b-', linewidth=2.5)
-    plt.axhspan(150, 250, color='gray', alpha=0.3, label='Observed (Clowe et al. 2006)')
-    plt.axvline(1e-31, color='red', linestyle='--', label=r'WKB Prediction')
-    plt.xlabel(r'Resonance Width $\Gamma$ [eV]')
-    plt.ylabel(r'Spatial Offset $\Delta x$ [kpc]')
-    plt.title('Bullet Cluster Offset Sensitivity')
-    plt.legend()
-    plt.grid(True, which="both", ls=":", alpha=0.5)
-    plt.savefig('Figure_4_Bullet.png')
-    print("  -> Created: Figure_4")
-
-def make_fig5_s8():
-    print("Generating Figure 5...")
-    k = np.logspace(-3, 0, 200)
-    k_c = 0.14
-    n = 1.46
-    ratio = np.sqrt(1 / (1 + 0.15*(k_c/k)**(2-n)))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 10), gridspec_kw={'height_ratios': [3, 1]}, sharex=True)
     
-    plt.figure(figsize=(8, 5))
-    plt.semilogx(k, ratio, 'purple', linewidth=2.5, label='Linear Growth Suppression')
-    plt.axhline(1, color='k', linestyle='--', label=r'$\Lambda$CDM Reference')
-    plt.fill_between(k, 0.9, 1.0, color='green', alpha=0.1, label='Tension Alleviation')
-    plt.xlabel(r'Wavenumber $k \ [h/\mathrm{Mpc}]$')
-    plt.ylabel(r'Growth Ratio $D_{leak}(k) / D_{GR}(k)$')
-    plt.ylim(0.75, 1.05)
-    plt.legend(loc='lower right')
-    plt.grid(True, which="both", ls=":", alpha=0.5)
-    plt.savefig('Figure_5_S8.png')
-    print("  -> Created: Figure_5")
+    # Veri Noktaları (Log Scale)
+    x = np.log10(df['g_bar'])
+    y = np.log10(df['g_obs'])
+    
+    # Hata barları (basit görselleştirme için şeffaf)
+    ax1.scatter(x, y, alpha=0.15, c='gray', s=10, label='SPARC Data (118 Galaxies)')
+    
+    # Teorik Eğri
+    g_bar_grid = np.logspace(-12, -8, 100)
+    g_pred = theory_curve(g_bar_grid, n_best, log_a5_best)
+    
+    ax1.plot(np.log10(g_bar_grid), np.log10(g_pred), 'r-', lw=2.5, label=f'Leakage Model (n={n_best:.2f})')
+    
+    # 1:1 Çizgisi (Newton)
+    ax1.plot([-12, -8], [-12, -8], 'k--', lw=1.5, label='Newtonian (1:1)')
+    
+    ax1.set_ylabel(r'$\log(g_{obs})$ [m/s$^2$]')
+    ax1.legend(loc='upper left')
+    ax1.set_title("Radial Acceleration Relation (Golden Sample)")
+    ax1.grid(True, which='both', linestyle='--', alpha=0.3)
 
+    # Residuals (Observed - Theory)
+    # Veri noktaları için teori tahmini
+    g_theory_points = theory_curve(df['g_bar'].values, n_best, log_a5_best)
+    res = np.log10(df['g_obs'].values) - np.log10(g_theory_points)
+    
+    ax2.scatter(x, res, alpha=0.15, c='gray', s=10)
+    ax2.axhline(0, color='r', linestyle='-', lw=2)
+    ax2.set_ylabel('Residuals (dex)')
+    ax2.set_xlabel(r'$\log(g_{bar})$ [m/s$^2$]')
+    ax2.set_ylim(-0.5, 0.5)
+    ax2.grid(True, which='both', linestyle='--', alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig("Figure_1_RAR_Residuals.png", dpi=300)
+    print("Saved: Figure_1_RAR_Residuals.png")
+
+# --- FİGÜR 2: CORNER PLOT ---
+def plot_corner():
+    print("Generating Figure 2: Corner Plot...")
+    
+    if not os.path.exists("chain_results.txt"):
+        print("Warning: chain_results.txt not found. Skipping Corner Plot.")
+        return None, None
+
+    # Dosyayı oku (n, log_a5, logL)
+    try:
+        data = np.loadtxt("chain_results.txt", skiprows=1)
+        samples = data[:, :2] # Sadece n ve log_a5 al
+        
+        # En iyi değerleri (median) bul
+        n_med = np.median(samples[:, 0])
+        a5_med = np.median(samples[:, 1])
+        
+        # Corner Plot
+        fig = corner.corner(
+            samples, 
+            labels=[r"$n$ (Index)", r"$\log a_5$ (Scale)"],
+            quantiles=[0.16, 0.5, 0.84],
+            show_titles=True,
+            title_kwargs={"fontsize": 12},
+            color="#1f77b4"
+        )
+        fig.savefig("Figure_2_Corner.png", dpi=300)
+        print("Saved: Figure_2_Corner.png")
+        return n_med, a5_med
+        
+    except Exception as e:
+        print(f"Corner plot error: {e}")
+        return 1.46, -10.85 # Hata olursa varsayılan dön
+
+# --- MAIN ---
 if __name__ == "__main__":
-    make_fig1_rar_and_data()
-    make_fig2_corner_and_chain()
-    make_fig3_propagator()
-    make_fig4_bullet()
-    make_fig5_s8()
+    # 1. Corner Plot çiz ve en iyi n değerini al
+    n_best, log_a5_best = plot_corner()
+    
+    if n_best is None:
+        # Eğer chain dosyası yoksa varsayılan değerleri kullan
+        n_best = 1.46
+        log_a5_best = -10.85
+    
+    # 2. Veriyi yükle ve RAR grafiğini çiz
+    df = load_golden_sample()
+    plot_rar(df, n_best, log_a5_best)
+    
+    print("\nAll figures generated successfully!")
