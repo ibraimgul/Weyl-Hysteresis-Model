@@ -1,0 +1,7 @@
+# Analysis Summary
+Galaxies: 175
+Data Points: 3391
+Log Evidence: 1098.03
+n: 2.1489 +/- 0.0283
+log_a5: -9.8975 +/- 0.0146
+sigma: 0.1304 +/- 0.0023
