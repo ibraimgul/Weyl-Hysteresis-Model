@@ -1,207 +1,193 @@
 """
-Non-Local Gravitational Leakage Analysis Pipeline
-=================================================
+Non-Local Gravity / Dark Dimension Leakage Analysis
+===================================================
 Author: Ibrahim Gul
-License: MIT
-Paper: "Non-Local Gravitational Leakage: A Spectral Propagator Ansatz from the Dark Dimension"
-
 Description:
-This script performs the Bayesian inference analysis on the SPARC galaxy dataset.
-It implements the Hybrid Leakage model derived from 5D Einstein-Dilaton gravity
-and compares it against the standard MOND framework.
+  This script performs a Bayesian analysis on galaxy rotation curves to constrain
+  the leakage parameters (n, a5). It reads raw data points from the SPARC database
+  subset (Golden Sample) and compares observed accelerations with theoretical predictions.
 
-Methodology:
-1. Loads SPARC galaxy data (Subset Q=1).
-2. Defines the effective acceleration relation g_obs(g_bar) based on the 
-   spectral propagator mu(k).
-3. Constructs the Gaussian Log-Likelihood with nuisance parameters for 
-   stellar Mass-to-Light ratios (marginalized).
-4. Runs Dynamic Nested Sampling using `dynesty`.
-5. Outputs posterior chains and best-fit parameters.
+Data Source:
+  - sparc_raw_full_3389_points.csv (Full raw rotation curves)
+  - golden_sample_list.txt (List of 118 high-quality galaxies)
+
+Method:
+  - Dynamic Nested Sampling (Dynesty)
+  - Robust Likelihood with Outlier Modeling
 """
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d
-import os
 import sys
+import os
 
-# Try importing dynesty, handle case if not present (for demo purposes)
+# Dynesty Kontrolü
 try:
     import dynesty
     from dynesty import utils as dyfunc
-    DYNESTY_AVAILABLE = True
 except ImportError:
-    DYNESTY_AVAILABLE = False
-    print("Warning: 'dynesty' not found. Running in likelihood-check mode only.")
+    print("Error: 'dynesty' library not found. Install via: pip install dynesty")
+    sys.exit(1)
 
-# --- CONSTANTS ---
-G_NEWTON = 6.674e-11  # m^3 kg^-1 s^-2
+# --- FİZİKSEL SABİTLER ---
+# Birim Dönüşümü: (km/s)^2 / kpc -> m/s^2
 KPC_TO_M = 3.086e19
-SIGMA_SYS = 0.11      # Systematic scatter in dex (Intrinsic)
+KM_TO_M = 1000.0
+CONV_FACTOR = (KM_TO_M**2) / KPC_TO_M
 
-# --- MODEL DEFINITIONS ---
+# Varsayılan Kütle-Işık Oranları (PopIII/Kroupa IMF referanslı)
+UPSILON_DISK = 0.5
+UPSILON_BULGE = 0.7
 
-def interpolation_function(x, n):
-    """
-    The effective interpolation function \nu(y) derived from the 
-    spectral propagator ansatz \mu(k) ~ 1 + (k_c/k)^{2-n}.
+# --- 1. VERİ YÜKLEME VE FİLTRELEME ---
+def load_data(csv_path="sparc_raw_full_3389_points.csv", list_path="sparc_subset_118_list.txt"):
+    print(f"Loading raw data from {csv_path}...")
     
-    In acceleration space, this phenomenologically maps to:
-    g_obs = g_bar * \nu(g_bar / g_0)
-    """
-    # Simple interpolation form mimicking the spectral behavior
-    # x = g_bar / g0
-    # For n=1 (MOND), returns standard simple mu function
-    # For n != 1, introduces slope modification
-    return 1.0 / (1.0 - np.exp(-np.sqrt(x)**(2.0/n))) # Generalized form
+    # 1. Ana Ham Veriyi Oku
+    if not os.path.exists(csv_path):
+        print(f"CRITICAL ERROR: {csv_path} not found!")
+        sys.exit(1)
+    
+    df_full = pd.read_csv(csv_path)
+    
+    # 2. 118 Galaksilik 'Altın Liste'yi Uygula
+    # Eğer liste dosyası varsa onu kullan, yoksa hepsini kullan (ama uyar)
+    if os.path.exists(list_path):
+        with open(list_path, 'r') as f:
+            valid_galaxies = [line.strip() for line in f if line.strip()]
+        
+        df = df_full[df_full['Galaxy'].isin(valid_galaxies)].copy()
+        print(f"Applied Filter: Selected {len(valid_galaxies)} galaxies (Golden Sample).")
+        print(f"Total Data Points used for Analysis: {len(df)}")
+    else:
+        print("WARNING: 'sparc_subset_118_list.txt' not found. Using ALL 175 galaxies (Results may be noisy).")
+        df = df_full.copy()
 
-def predict_g_obs(g_bar, n, a5):
-    """
-    Predict observed acceleration given baryonic acceleration and model parameters.
+    # 3. İvme Hesaplamaları (Ham Hızlardan)
+    # g = V^2 / R formülü uygulanıyor
+    R_kpc = df['Radius'].values
+    valid_mask = R_kpc > 0  # Yarıçapı 0 olanları at
+    df = df[valid_mask]
+    R_kpc = df['Radius'].values
+
+    # Gözlenen İvme
+    g_obs = (df['Vobs'].values**2 / R_kpc) * CONV_FACTOR
     
-    Params:
-    -------
-    g_bar : array
-        Baryonic acceleration [m/s^2]
-    n : float
-        Transition index (Theoretical vacuum value 1.5, Fit ~1.2-1.5)
-    a5 : float
-        Leakage scale parameter (log10)
+    # Baryonik İvme Bileşenleri (Disk, Gaz, Bulge)
+    # V_bar^2 = V_gas^2 + V_disk^2 * Y_disk + V_bul^2 * Y_bul
+    V_gas_sq = df['Vgas'].values**2
+    V_disk_sq = df['Vdisk'].values**2
+    V_bul_sq = df['Vbul'].values**2
     
-    Returns:
-    --------
-    g_obs : array
-        Predicted observed acceleration
+    # Bileşenleri dataframe'e ekle (Likelihood içinde M/L ile çarpacağız)
+    df['g_obs'] = g_obs
+    df['term_gas'] = (V_gas_sq / R_kpc) * CONV_FACTOR
+    df['term_disk'] = (V_disk_sq / R_kpc) * CONV_FACTOR
+    df['term_bul'] = (V_bul_sq / R_kpc) * CONV_FACTOR
+    
+    return df
+
+# --- 2. TEORİK MODEL (Sızıntı) ---
+def theory_leakage(g_bar, n, log_a5):
     """
-    g0 = 10**a5 # Characteristic acceleration scale
-    nu = interpolation_function(g_bar / g0, n)
+    Hesaplar: g_eff = g_bar * nu(g_bar/a5, n)
+    """
+    a5 = 10**log_a5
+    # Sızıntı Fonksiyonu (Spectral Propagator Ansatz)
+    # nu(y) = 1 / (1 - exp(-sqrt(y)^(2/n)))
+    # y = g_bar / a5
+    
+    # Sayısal kararlılık için çok küçük g_bar değerlerini koru
+    g_bar = np.maximum(g_bar, 1e-18)
+    y = g_bar / a5
+    
+    # Üs hesabı
+    exponent = -np.power(np.sqrt(y), 2.0/n)
+    denominator = 1.0 - np.exp(exponent)
+    
+    nu = 1.0 / denominator
     return g_bar * nu
 
-# --- BAYESIAN INFERENCE SETUP ---
-
+# --- 3. LOG-LIKELIHOOD ---
 def log_likelihood(theta, data):
+    # theta: [n, log_a5, intrinsic_scatter, f_outlier]
+    n, log_a5, sigma_int, f_out = theta
+    
+    # Baryonik İvme Hesabı (Sabit M/L varsayımı ile)
+    # İstersen M/L'yi de parametre yapabilirsin ama şimdilik standart tutuyoruz.
+    g_bar = data['term_gas'] + (UPSILON_DISK * data['term_disk']) + (UPSILON_BULGE * data['term_bul'])
+    
+    # Teorik Tahmin
+    g_pred = theory_leakage(g_bar, n, log_a5)
+    
+    # Logaritmik Farklar (Residuals)
+    g_obs = data['g_obs']
+    
+    # Sadece pozitif ivmelerde log alınabilir
+    mask = (g_obs > 1e-15) & (g_pred > 1e-15)
+    res = np.log10(g_obs[mask]) - np.log10(g_pred[mask])
+    
+    # Mixture Model (Gürültü yönetimi)
+    # Model 1: İyi veri (Sigma_total^2 = Sigma_obs^2 + Sigma_int^2)
+    # Burada basitleştirme için global sigma kullanıyoruz (makalendeki gibi)
+    sigma_total = sigma_int 
+    
+    # Model 2: Outlier dağılımı (Daha geniş sigma)
+    sigma_bad = 0.5 # 0.5 dex saçılma (çok kötü veri)
+    
+    # Log-Likelihood Calculation
+    ln_p_good = -0.5 * (res**2 / sigma_total**2 + np.log(2 * np.pi * sigma_total**2))
+    ln_p_bad  = -0.5 * (res**2 / sigma_bad**2   + np.log(2 * np.pi * sigma_bad**2))
+    
+    # Toplam Olasılık: (1-f)*Good + f*Bad
+    log_L = np.logaddexp(np.log(1 - f_out) + ln_p_good, np.log(f_out) + ln_p_bad)
+    
+    return np.sum(log_L)
+
+# --- 4. PRIOR DÖNÜŞÜMÜ ---
+def prior_transform(u):
     """
-    Gaussian Log-Likelihood function.
-    
-    theta : [n, log10_a5]
-    data  : pandas DataFrame containing 'log_g_bar', 'log_g_obs'
+    Unit cube [0,1] -> Physical Parameters
     """
-    n, log_a5 = theta
-    
-    # Unpack data
-    log_g_bar = data['log_g_bar'].values
-    log_g_obs = data['log_g_obs'].values
-    
-    g_bar = 10**log_g_bar
-    g_obs_measured = 10**log_g_obs
-    
-    # Model prediction
-    g_model = predict_g_obs(g_bar, n, log_a5)
-    
-    # Residuals in log space (dex)
-    residuals = np.log10(g_obs_measured) - np.log10(g_model)
-    
-    # Total variance: Observation error + Systematics + Model error
-    # Note: sigma_obs is assumed implicit in the scatter for this subset analysis
-    sigma2 = SIGMA_SYS**2
-    
-    chi2 = np.sum(residuals**2 / sigma2)
-    log_l = -0.5 * np.sum(np.log(2 * np.pi * sigma2)) - 0.5 * chi2
-    
-    return log_l
+    n = 1.0 + u[0] * 2.0       # n: [1.0, 3.0]
+    log_a5 = -13.0 + u[1]*5.0  # log_a5: [-13, -8]
+    sigma = 0.05 + u[2]*0.2    # sigma: [0.05, 0.25]
+    f_out = u[3] * 0.1         # f_out: [0.0, 0.1] (Max %10 outlier kabulü)
+    return n, log_a5, sigma, f_out
 
-def prior_transform(u_theta):
-    """
-    Transform unit cube [0,1] to physical prior space.
-    
-    Priors:
-    n      : Uniform [1.0, 2.0]
-    log_a5 : Uniform [-13, -7]  (covering a wide range around -10)
-    """
-    u_n, u_a5 = u_theta
-    
-    # n ~ U[1.0, 2.0]
-    n = 1.0 + u_n * 1.0 
-    
-    # log_a5 ~ U[-13, -7]
-    log_a5 = -13.0 + u_a5 * 6.0
-    
-    return n, log_a5
-
-# --- MAIN ANALYSIS LOOP ---
-
-def run_analysis():
-    print("--- Starting Non-Local Gravity Analysis ---")
-    
-    # 1. Load Data
-    data_path = 'sparc_subset_118.csv'
-    if not os.path.exists(data_path):
-        print(f"Error: Data file {data_path} not found.")
-        print("Please run 'generate_final_figures.py' first to simulate the dataset.")
-        return
-
-    print(f"Loading data from {data_path}...")
-    df = pd.read_csv(data_path)
-    print(f"Loaded {len(df)} galaxies (SPARC Q=1 Subset).")
-
-    # 2. Setup Nested Sampling
-    if DYNESTY_AVAILABLE:
-        print("Initializing Dynamic Nested Sampling...")
-        
-        # Define wrapper for likelihood to pass data
-        def loglike_wrapper(theta):
-            return log_likelihood(theta, df)
-        
-        # Initialize sampler
-        dsampler = dynesty.DynamicNestedSampler(
-            loglike_wrapper, 
-            prior_transform, 
-            ndim=2,
-            bound='multi', 
-            sample='rwalk',
-            nlive=500
-        )
-        
-        print("Running sampling (this may take some time)...")
-        # For demonstration, we limit maxiter. In production, remove maxiter.
-        dsampler.run_nested(dlogz_init=0.01, maxiter=2000)
-        
-        results = dsampler.results
-        print("\nAnalysis Complete.")
-        print(f"Log Evidence (lnZ): {results.logz[-1]:.2f} +/- {results.logzerr[-1]:.2f}")
-        
-        # Extract best fit
-        weights = np.exp(results.logwt - results.logz[-1])
-        samples = results.samples
-        mean = np.average(samples, weights=weights, axis=0)
-        std = np.sqrt(np.average((samples - mean)**2, weights=weights, axis=0))
-        
-        print("\nPosterior Constraints:")
-        print(f"n      = {mean[0]:.3f} +/- {std[0]:.3f}")
-        print(f"log_a5 = {mean[1]:.3f} +/- {std[1]:.3f}")
-        
-        # Save chain for plotting
-        print("Saving chains to 'chain_results.txt'...")
-        np.savetxt('chain_results.txt', samples, header='n log_a5')
-        
-    else:
-        print("Skipping MCMC run (dynesty not installed).")
-        print("Performing a quick Least-Squares check instead...")
-        
-        from scipy.optimize import minimize
-        
-        def neg_loglike(theta):
-            return -log_likelihood(theta, df)
-        
-        initial_guess = [1.5, -10.0]
-        res = minimize(neg_loglike, initial_guess, bounds=[(1.0, 2.0), (-13, -7)])
-        
-        print("\nOptimization Result:")
-        print(f"Best Fit n      : {res.x[0]:.4f}")
-        print(f"Best Fit log_a5 : {res.x[1]:.4f}")
-        print(f"Max Log-Like    : {-res.fun:.2f}")
-
+# --- MAIN ÇALIŞTIRMA ---
 if __name__ == "__main__":
-    run_analysis()
+    # Veriyi Yükle
+    df = load_data()
+    
+    # Sampler Ayarları
+    print("\nInitializing Dynamic Nested Sampling...")
+    dsampler = dynesty.DynamicNestedSampler(
+        lambda t: log_likelihood(t, df),
+        prior_transform,
+        ndim=4,
+        bound='multi',
+        sample='rwalk',
+        nlive=500
+    )
+    
+    # Çalıştır
+    print("Running Analysis (This may take time)...")
+    dsampler.run_nested(dlogz_init=0.05)
+    
+    # Sonuçları Kaydet
+    res = dsampler.results
+    
+    # 1. chain_results.txt (Ham zincir - Grafikler için)
+    # Format: n, log_a5, log_likelihood (Ağırlıklı örneklerden)
+    print("Saving chain results...")
+    samples = res.samples  # param samples
+    logl = res.logl        # log likelihoods
+    
+    # Dosyaya yaz (n, a5, logL sütunları)
+    # generate_final_figures.py bu formatı bekliyor
+    output_data = np.column_stack((samples[:, 0], samples[:, 1], logl))
+    np.savetxt("chain_results.txt", output_data, header="n_index log10_a5 log_likelihood", comments="")
+    
+    print("\n--- ANALYSIS COMPLETE ---")
+    print(f"Results saved to chain_results.txt")
