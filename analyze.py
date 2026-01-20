@@ -2,15 +2,10 @@
 Non-Local Gravity / Dark Dimension Leakage Analysis
 ===================================================
 Author: Ibrahim Gul
-Status: Final Production Version
 Description:
-  This script performs a Bayesian analysis on galaxy rotation curves to constrain
-  the leakage parameters (n, a5) using the SPARC 'Golden Sample'.
-  It implements the Spectral Propagator Ansatz derived from 5D Einstein-Dilaton theory.
-
-Outputs:
-  - chain_results.txt: Raw posterior chains for plotting.
-  - analysis_summary.txt: Statistical summary (Mean, Error, Bayes Factor).
+  Bayesian analysis of SPARC rotation curves using Dark Dimension leakage model.
+  This script reads the provided galaxy list and raw data, performs the
+  Dynesty sampling, and outputs the posterior chains.
 """
 
 import numpy as np
@@ -19,127 +14,95 @@ import sys
 import os
 import time
 
-# Kütüphane Kontrolü
 try:
     import dynesty
     from dynesty import utils as dyfunc
 except ImportError:
-    print("CRITICAL ERROR: 'dynesty' library not found.")
-    print("Please install it via: pip install dynesty")
+    print("Error: 'dynesty' library not found. Please install it.")
     sys.exit(1)
 
-# --- 1. FİZİKSEL SABİTLER VE AYARLAR ---
-# Birim Dönüşümü: (km/s)^2 / kpc -> m/s^2
+# --- CONFIGURATION & CONSTANTS ---
 KPC_TO_M = 3.086e19
 KM_TO_M = 1000.0
 CONV_FACTOR = (KM_TO_M**2) / KPC_TO_M
 
-# Kütle-Işık Oranları (Stellar Mass-to-Light Ratios)
-# SPARC "Standard" değerleri (PopIII/Kroupa IMF ile tutarlı)
+# Mass-to-Light Ratios (Standard PopIII/Kroupa)
 UPSILON_DISK = 0.5
 UPSILON_BULGE = 0.7
 
-# Dosya Yolları
+# File Paths
 DATA_FILE = "sparc_raw_full_3389_points.csv"
 LIST_FILE = "sparc_subset_118_list.txt"
 OUTPUT_CHAIN = "chain_results.txt"
 OUTPUT_SUMMARY = "analysis_summary.txt"
 
-# --- 2. VERİ YÜKLEME VE İŞLEME ---
+# --- DATA LOADING ---
 def load_data():
-    print(f"--> Loading raw data from {DATA_FILE}...")
-    
     if not os.path.exists(DATA_FILE):
-        print(f"ERROR: {DATA_FILE} not found!")
+        print(f"Error: Data file {DATA_FILE} not found.")
         sys.exit(1)
     
-    df_full = pd.read_csv(DATA_FILE)
+    df = pd.read_csv(DATA_FILE)
     
-    # Filtreleme Listesi Kontrolü
+    # Filter by list if it exists
     if os.path.exists(LIST_FILE):
         with open(LIST_FILE, 'r') as f:
-            # Tekrarlayan isimleri (duplicates) temizle ve sırala
-            raw_list = [line.strip() for line in f if line.strip()]
-            valid_galaxies = sorted(list(set(raw_list)))
+            # Read IDs and remove duplicates to prevent processing errors
+            valid_galaxies = sorted(list(set([line.strip() for line in f if line.strip()])))
         
-        # Sadece listedeki galaksileri seç
-        df = df_full[df_full['Galaxy'].isin(valid_galaxies)].copy()
-        
-        print(f"--> Filter Applied: {len(valid_galaxies)} unique IDs found in list.")
-        print(f"--> Final Selection: Using {df['Galaxy'].nunique()} galaxies found in dataset.")
-    else:
-        print("--> WARNING: Filter list not found. Using FULL dataset (Caution!).")
-        df = df_full.copy()
-
-    # İvme Hesaplamaları (Fiziksel Birim: m/s^2)
-    # R <= 0 olan hatalı noktaları temizle
-    df = df[df['Radius'] > 0].copy()
+        df = df[df['Galaxy'].isin(valid_galaxies)].copy()
+        print(f"--> Analysis set: {len(valid_galaxies)} galaxies loaded from list.")
     
+    # Physics Preparations
+    # Remove non-physical radii
+    df = df[df['Radius'] > 0].copy()
     R_kpc = df['Radius'].values
     
-    # Gözlenen İvme: g_obs = V_obs^2 / R
+    # Calculate Accelerations (m/s^2)
     df['g_obs'] = (df['Vobs'].values**2 / R_kpc) * CONV_FACTOR
-    
-    # Baryonik Bileşenler: g_x = V_x^2 / R
-    # (Bileşenleri ayrı ayrı saklıyoruz, likelihood'da birleştireceğiz)
     df['term_gas'] = (df['Vgas'].values**2 / R_kpc) * CONV_FACTOR
     df['term_disk'] = (df['Vdisk'].values**2 / R_kpc) * CONV_FACTOR
     df['term_bul'] = (df['Vbul'].values**2 / R_kpc) * CONV_FACTOR
     
-    # NaN veya Sonsuz değerleri temizle
+    # Clean NaNs/Infs
     df = df.replace([np.inf, -np.inf], np.nan).dropna()
     
-    print(f"--> Data Ready: {len(df)} total radial points loaded.")
     return df
 
-# --- 3. TEORİK MODEL (DARK DIMENSION LEAKAGE) ---
+# --- THEORETICAL MODEL ---
 def theory_leakage(g_bar, n, log_a5):
     """
-    Hesaplar: g_eff = g_bar * nu(g_bar/a5)
-    Model: Spectral Propagator Ansatz (Makale Eq. 2)
-    Formül: nu(y) = 1 / (1 - exp(-sqrt(y)^(2/n)))
+    Spectral Propagator Ansatz: g_eff = g_bar / (1 - exp(-sqrt(g/a5)^(2/n)))
     """
     a5 = 10**log_a5
+    g_bar = np.maximum(g_bar, 1e-20) # Avoid zero division
     
-    # Sayısal kararlılık (0'a bölmeyi önle)
-    g_bar = np.maximum(g_bar, 1e-20)
     y = g_bar / a5
-    
-    # Bessel Modlarından Türetilen Geçiş Fonksiyonu
-    # n = 2*nu (Order of Bessel function related)
     exponent = -np.power(np.sqrt(y), 2.0/n)
     
-    # Overflow koruması
     denominator = 1.0 - np.exp(exponent)
-    denominator = np.maximum(denominator, 1e-10) # Asla 0 olmasın
+    denominator = np.maximum(denominator, 1e-10) # Avoid overflow
     
-    nu = 1.0 / denominator
-    return g_bar * nu
+    return g_bar / denominator
 
-# --- 4. BAYESIAN LIKELIHOOD & PRIOR ---
+# --- LIKELIHOOD FUNCTION ---
 def log_likelihood(theta, data):
-    # theta: [n, log_a5, sigma_int, f_out]
     n, log_a5, sigma_int, f_out = theta
     
-    # 1. Baryonik İvme (g_bar)
+    # Baryonic Acceleration
     g_bar = data['term_gas'] + (UPSILON_DISK * data['term_disk']) + (UPSILON_BULGE * data['term_bul'])
     
-    # 2. Model Tahmini (g_pred)
+    # Model Prediction
     g_pred = theory_leakage(g_bar, n, log_a5)
     
-    # 3. Residuals (Logaritmik Uzayda)
+    # Residuals
     mask = (data['g_obs'] > 1e-20) & (g_pred > 1e-20)
-    if np.sum(mask) < 5: return -1e10 # Veri çok kötüyse öldür
+    if np.sum(mask) < 5: return -1e10
     
-    obs = data['g_obs'][mask]
-    pred = g_pred[mask]
+    res = np.log10(data['g_obs'][mask]) - np.log10(g_pred[mask])
     
-    res = np.log10(obs) - np.log10(pred)
-    
-    # 4. Robust Likelihood (Mixture Model)
-    # Makaledeki %10 outlier toleransını uygular.
-    sigma_bad = 0.5 
-    
+    # Robust Mixture Model (Signal + Outlier)
+    sigma_bad = 0.5
     ln_p_good = -0.5 * (res**2 / sigma_int**2 + np.log(2 * np.pi * sigma_int**2))
     ln_p_bad  = -0.5 * (res**2 / sigma_bad**2 + np.log(2 * np.pi * sigma_bad**2))
     
@@ -147,45 +110,44 @@ def log_likelihood(theta, data):
     
     return np.sum(log_L)
 
+# --- PRIORS ---
 def prior_transform(u):
-    """
-    Unit Cube [0,1] -> Physical Parameters
-    Aralıklar makale sonuçlarını (n~1.46, log_a5~-10.85) kapsayacak şekilde ayarlandı.
-    """
-    n = 1.0 + u[0] * 2.0        # n: [1.0, 3.0]
-    log_a5 = -13.0 + u[1]*5.0   # log_a5: [-13, -8]
-    sigma = 0.05 + u[2]*0.2     # sigma: [0.05, 0.25]
-    f_out = u[3] * 0.1          # f_out: [0.0, 0.1]
-    return n, log_a5, sigma, f_out
+    # n: [1.0, 3.0], log_a5: [-13, -8], sigma: [0.05, 0.25], f_out: [0, 0.1]
+    return (1.0 + u[0]*2.0, -13.0 + u[1]*5.0, 0.05 + u[2]*0.2, u[3]*0.1)
 
-# --- 5. ANA ÇALIŞMA BLOĞU ---
+# --- MAIN EXECUTION ---
 if __name__ == "__main__":
-    start_time = time.time()
-    
-    # 1. Veri Hazırlığı
+    print("--> Loading data...")
     df = load_data()
     
-    # 2. Dynesty Kurulumu
-    print("\n--> Initializing Dynamic Nested Sampling (Dynesty)...")
+    print(f"--> Starting Dynesty run on {len(df)} data points...")
     dsampler = dynesty.DynamicNestedSampler(
         lambda t: log_likelihood(t, df),
         prior_transform,
         ndim=4,
         bound='multi',
         sample='rwalk',
-        nlive=500  # Makale kalitesinde örnekleme
+        nlive=500
     )
-    
-    # 3. Analizi Başlat
-    print("--> Running Sampling (This may take several minutes)...")
     dsampler.run_nested(dlogz_init=0.05, print_progress=True)
     
-    # 4. Sonuçları Kaydet
+    # Save Results
+    print("--> Saving results...")
     res = dsampler.results
-    samples = res.samples
+    data_out = np.column_stack((res.samples, res.logl))
+    np.savetxt(OUTPUT_CHAIN, data_out, header="n log_a5 sigma f_out logL", comments="")
     
-    # Dosyaya yaz (Grafik çizimi için ham zincir)
-    save_data = np.column_stack((samples, res.logl))
-    np.savetxt(OUTPUT_CHAIN, save_data, header="n log_a5 sigma f_out logL", comments="")
+    # Save Summary
+    mean, cov = dyfunc.mean_and_cov(res.samples, np.exp(res.logwt - res.logz[-1]))
+    std = np.sqrt(np.diag(cov))
     
-    print(f"\n--> ANALYSIS COMPLETE. Results saved to {OUTPUT_CHAIN}")
+    with open(OUTPUT_SUMMARY, 'w') as f:
+        f.write(f"# Analysis Summary\n")
+        f.write(f"Galaxies: {df['Galaxy'].nunique()}\n")
+        f.write(f"Data Points: {len(df)}\n")
+        f.write(f"Log Evidence: {res.logz[-1]:.2f}\n")
+        f.write(f"n: {mean[0]:.4f} +/- {std[0]:.4f}\n")
+        f.write(f"log_a5: {mean[1]:.4f} +/- {std[1]:.4f}\n")
+        f.write(f"sigma: {mean[2]:.4f} +/- {std[2]:.4f}\n")
+    
+    print("--> Done.")
